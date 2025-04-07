@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'main.css' %}">
+    <script src="{% static 'main.js' %}"></script>
+</head>
+<body>
+    <h1>Список всех заявок</h1>
+    {% for order in orders %}
+    <p>{{ order.client_name }}</p>
+    <p>{{ order.status }}</p>
+    <hr>
+    {% endfor %}
+</body>
+</html>
