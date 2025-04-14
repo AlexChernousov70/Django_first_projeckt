@@ -125,8 +125,11 @@ USE_TZ = True
 # Указываем путь к статическим файлам в проекте. Это адрес на сервере, по которому будут доступны статические файлы
 STATIC_URL = '/static/'
 
-# Указывает Django, где искать статические файлы помимо папок static/ внутри приложений
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# Указали путь к папке, где будут храниться статические файлы
+STATICFILES_DIRS = [
+    BASE_DIR / "core/static", # Статика приложения core
+    BASE_DIR / "static", # Глобальная статика
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
