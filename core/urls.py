@@ -1,6 +1,6 @@
 # core/urls.py
 from django.urls import path
-from core.views import landing, thanks, orders_list, order_detail
+from .views import thanks, orders_list, order_detail
 
 # Эти маршруты будут доступны с префиксом /barbershop/
 urlpatterns = [

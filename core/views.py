@@ -120,16 +120,16 @@ def landing(request):
         'services': services,
     }
 
-    return render(request, 'landing.html', context)
+    return render(request, 'core/landing.html', context)
 
 def thanks(request):
-    return render(request, 'thanks.html')
+    return render(request, 'core/thanks.html')
 
 def orders_list(request):
     context = {
         'orders': orders
     }
-    return render(request, 'orders_list.html', context)
+    return render(request, 'core/orders_list.html', context)
 
 def order_detail(request, order_id):
     try:
