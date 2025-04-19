@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Барбершоп 'SteelBarber' в Москве - мужские стрижки, бритьё и уход за бородой">
+    <meta name="keywords" content="барбершоп, мужская стрижка, бритьё, уход за бородой">
+    <meta name="author" content="Барбершоп Стальная борода">
+
+    <!-- Фавиконка -->
+    <link rel="icon" href="{% static 'images/favicon.png' %}">
+    <title>{% block title %}Барбершоп "SteelBarber"{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Иконки Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Свои стили -->
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+    <!-- Дополнительные стили styles -->
+    {% block styles %}{% endblock %}
+
+    <!-- Дополнительный блок extra_head -->
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- Шапка -->
+    {% block header %}
+    <header class="sticky-top">
+        {% include 'core/includes/menu.html' %}
+    </header>
+    {% endblock %}
+
+    <!-- Основное содержимое -->
+    <main class="flex-grow-1 py-4">
+        <div class="container my-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-8">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Футер -->
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container">
+            <div class="row border-top border-secondary pt-3">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-warning">Барбершоп "Стальная Борода"</h5>
+                    <p><i class="bi bi-geo-alt-fill me-2"></i>Москва, ул. Пушкина, д. Колотушкина</p>
+                    <p><i class="bi bi-telephone-fill me-2"></i>+7 (977) 906-77-77</p>
+                    <p><i class="bi bi-clock-fill me-2"></i>Ежедневно с 10:00 до 22:00</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-warning">Мы здесь! <i class="bi bi-geo-alt-fill"></i></h5>
+                    
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://yandex.ru/map-widget/v1/?ll=37.528610%2C55.886768&z=16" 
+                                frameborder="0" 
+                                allowfullscreen
+                                class="rounded">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <p class="mb-0 text-muted">© {% now "Y" %} Академия Топ. Python412</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Свои скрипты -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <!-- Дополнительные скрипты -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>
