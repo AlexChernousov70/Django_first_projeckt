@@ -123,7 +123,11 @@ def landing(request):
     return render(request, 'core/landing.html', context)
 
 def thanks(request):
-    return render(request, 'core/thanks.html')
+    context = {
+        'masters_count': len(masters)
+    }
+    return render(request, 'core/thanks.html', context)
+    
 
 def orders_list(request):
     context = {
@@ -139,5 +143,5 @@ def order_detail(request, order_id):
         return HttpResponse(status=404)
     master_id = order["master_id"]
     master = next(m for m in masters if m["id"] == master_id)
-    context = {"order": order, "master": master}
+    context = {"order": order, "master": master, "title": f"Заказ №{order_id}"}
     return render(request, 'order_detail.html', context)
