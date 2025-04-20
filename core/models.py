@@ -46,7 +46,7 @@ class Master(models.Model):
     email = models.EmailField(blank=True)
     experience = models.PositiveIntegerField(verbose_name="Стаж работы", help_text="Опыт работы в годах")
     # Многие ко многим
-    # services = models.ManyToManyField("Service", related_name="masters")
+    services = models.ManyToManyField("Service", related_name="masters")
     is_active = models.BooleanField(default=True, verbose_name="Активен")
 
     class Meta:
@@ -56,3 +56,20 @@ class Master(models.Model):
 
     def __str__(self):
         return f"{self.name} (Стаж: {self.experience} лет)"
+    
+class Service(models.Model):
+    """Модель услуги"""
+    name = models.CharField(max_length=200, verbose_name="Название услуги")
+    description = models.TextField(verbose_name="Описание услуги")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена услуги")
+    duration = models.PositiveIntegerField(help_text="Время выполнения в минутах", verbose_name="Время выполнения услуги")
+    is_popular = models.BooleanField(default=False, verbose_name="Популярная услуга")
+    image = models.ImageField(upload_to="images/services/", blank=True, null=True, verbose_name="Изображение услуги")
+
+    class Meta:
+        verbose_name = "Услуга"
+        verbose_name_plural = "Услуги"
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} - {self.price}₽ ({self.duration} мин)"
