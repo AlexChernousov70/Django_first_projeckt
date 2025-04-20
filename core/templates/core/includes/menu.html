@@ -37,6 +37,13 @@
         <li class="nav-item">
           <a class="nav-link active" href="{% url 'landing' %}#booking">Запись</a>
         </li>
+        {% if user.is_staff %}  <!-- Только для персонала -->
+        <li class="nav-item">
+          <a class="nav-link active text-warning" href="{% url 'orders_list' %}">
+            <i class="fas fa-list-check me-1"></i> Список заказов
+          </a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </div>

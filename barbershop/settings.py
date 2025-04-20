@@ -67,7 +67,7 @@ TEMPLATES = [
             'context_processors': [ # Здесь хранятся все контекстные процессоры
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
+                'django.contrib.auth.context_processors.auth', # с помощью этого процессора мы можем получить доступ к объекту пользователя
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.menu_context',  # Добавили наш контекстный процессор
             ],

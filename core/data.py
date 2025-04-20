@@ -4,10 +4,6 @@ MENU_ITEMS = [
         "url_name": "landing"
     },
     {
-        "name": "Список заказов",
-        "url_name": "orders_list"
-    },
-    {
         "name": "Спасибо",
         "url_name": "thanks"
     }
