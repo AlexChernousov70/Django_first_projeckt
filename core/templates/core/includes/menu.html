@@ -16,17 +16,26 @@
     
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        {% for item in menu_items %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'landing' %}#about">О нас</a>
+          <a
+            class="nav-link active"
+            aria-current="page"
+            href="{% url item.url_name %}"
+            >{{ item.name }}</a>
+          {% endfor %}
+
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'landing' %}#about">О нас</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'landing' %}barbershop/orders">Услуги</a>
+          <a class="nav-link active" href="{% url 'landing' %}#service">Услуги</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'landing' %}#masters">Мастера</a>
+          <a class="nav-link active" href="{% url 'landing' %}#masters">Мастера</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'landing' %}#booking">Запись</a>
+          <a class="nav-link active" href="{% url 'landing' %}#booking">Запись</a>
         </li>
       </ul>
     </div>
