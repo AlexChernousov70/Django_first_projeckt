@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row align-items-center mb-3">
+        <div class="col">
+            <h1 class="mb-0">Заявки:</h1>
+        </div>
+        <div class="col-auto">
+            <span class='badge bg-secondary'>Всего заявок: {{orders|length}}</span>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for order in orders %}
+        <!-- Для 2 карточек в ряд используем col-md-6 -->
+        <!-- Для 3 карточек в ряд заменить на col-md-4 -->
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            {% include 'core/includes/order_card.html' %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock content %}
