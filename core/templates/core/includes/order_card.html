@@ -1,0 +1,23 @@
+{% load static %}
+{% load order_tags %} <!-- Подключения тега, созданого нами -->
+<div class="card h-100">
+    <h5 class="card-title text-center p-2">Заявка №{{order.id}}</h5>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">{{order.client_name}}</li>
+        <li class="list-group-item">{{order.date}}</li>
+        <li class="list-group-item {{order.status|status_class}}">  <!-- Применяем класс из тега!! -->
+            <strong>{{order.status}}</strong>
+        </li>
+        <li class="list-group-item">
+            <ul>
+                {% for service in order.services %}  <!-- Цикл по списку услуг заказа -->
+                <li>{{service}}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
+    <div class="card-footer mt-auto">
+        {% comment %} Кнопка с псевдонимом 'orders/<int:order_id>/', order_detail,  {% endcomment %}
+        <a href="{% url 'order_detail' order.id %}" class="btn btn-dark">Подробнее</a>
+    </div>
+</div>
