@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator # необходимо для валидации поля rating модели Review
 
 
 class Order(models.Model):
@@ -67,9 +68,63 @@ class Service(models.Model):
     image = models.ImageField(upload_to="images/services/", blank=True, null=True, verbose_name="Изображение услуги")
 
     class Meta:
+        """Имена для отображения в админ-панели и в интерфейсе пользователя, а также сортировка по имени"""
         verbose_name = "Услуга"
         verbose_name_plural = "Услуги"
         ordering = ['name']
 
     def __str__(self):
         return f"{self.name} - {self.price}₽ ({self.duration} мин)"
+
+class Review(models.Model):
+    """Модель отзыва о мастере"""
+    RATING_CHOICES = [
+        (1, '1 - Плохо'),
+        (2, '2 - Удовлетворительно'),
+        (3, '3 - Нормально'),
+        (4, '4 - Хорошо'),
+        (5, '5 - Отлично'),
+    ]
+    text = models.TextField(verbose_name="Текст отзыва")
+    client_name = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Имя клиента"
+    )
+    master = models.ForeignKey(
+        'Master',
+        on_delete=models.CASCADE,
+        verbose_name="Мастер",
+        related_name='reviews'
+    )
+    photo = models.ImageField(
+        upload_to="reviews/",
+        blank=True,
+        null=True,
+        verbose_name="Фотография"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата создания"
+    )
+    rating = models.PositiveSmallIntegerField(
+        choices=RATING_CHOICES,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5)
+        ],
+        verbose_name="Оценка"
+    )
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name="Опубликован"
+    )
+
+    class Meta:
+        """Имена для отображения в админ-панели и в интерфейсе пользователя, а также сортировка по полям модели и индексы для ускорения запросов."""
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+        ordering = ['-created_at'] # сортировка по полю created_at в обратном порядке (от новых к старым)
+        indexes = [
+            models.Index(fields=['-created_at', 'rating']),
+        ] # создание индекса для ускорения запросов по полям created_at и rating
