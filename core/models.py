@@ -23,7 +23,7 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     date_updated = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     # Один ко многим
-    # master = models.ForeignKey("Master", on_delete=models.SET_NULL, null=True, related_name="orders")
+    master = models.ForeignKey("Master", on_delete=models.SET_NULL, null=True, related_name="orders")
     appointment_date = models.DateTimeField(blank=True, null=True, verbose_name="Дата и время записи")
 
     class Meta:
@@ -36,3 +36,23 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Заказ #{self.id} - {self.client_name} ({self.get_status_display()})"
+
+class Master(models.Model):
+    """Модель мастеров"""
+    name = models.CharField(max_length=150, verbose_name="Имя")
+    photo = models.ImageField(upload_to="images/masters/", blank=True, null=True, verbose_name="Фотография")
+    phone = models.CharField(max_length=20, verbose_name="Телефон")
+    address = models.CharField(max_length=255, verbose_name="Адрес")
+    email = models.EmailField(blank=True)
+    experience = models.PositiveIntegerField(verbose_name="Стаж работы", help_text="Опыт работы в годах")
+    # Многие ко многим
+    # services = models.ManyToManyField("Service", related_name="masters")
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+
+    class Meta:
+        verbose_name = "Мастер"
+        verbose_name_plural = "Мастера"
+        ordering = ['name'] # сортировка по полю name
+
+    def __str__(self):
+        return f"{self.name} (Стаж: {self.experience} лет)"

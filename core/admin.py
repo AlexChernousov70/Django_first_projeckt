@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Order
+from .models import Order, Master
 
 
 # Регистрация в одну строку
 admin.site.register(Order)
-# admin.site.register(Master)
+admin.site.register(Master)
 # admin.site.register(Service)
 # admin.site.register(Review)
