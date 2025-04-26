@@ -3,12 +3,21 @@
     <div class="card-header" style="background-color: #2c3e50; border-radius: 12px 12px 0 0 !important;">
         <h5 class="card-title mb-0 text-center text-white">Отзыв #{{ review.id }}</h5>
     </div>
-    
     <div class="card-body">
+        <div class="master-badge mb-3 p-2 rounded" style="background-color: #ecf0f1;">
+            <small class="text-muted">Мастер:</small>
+            <div class="d-flex align-items-center">
+                {% if review.master.photo %}
+                    <img src="{{ review.master.photo.url }}" class="rounded-circle me-2" width="32" height="32" alt="{{ review.master.name }}">
+                {% endif %}
+                <strong style="color: #2c3e50;">{{ review.master.name }}</strong>
+            </div>
+        </div>
+        
         <div class="d-flex align-items-center mb-3">
             {% if review.client_name %}
                 <div class="user-icon bg-dark rounded-circle d-flex align-items-center justify-content-center" 
-                     style="width: 42px; height: 42px; margin-right: 12px; background-color: #34495e !important;">
+                    style="width: 42px; height: 42px; margin-right: 12px; background-color: #34495e !important;">
                     <span class="text-white fw-bold">{{ review.client_name|first|upper }}</span>
                 </div>
                 <h6 class="mb-0" style="color: #2c3e50;">{{ review.client_name }}</h6>

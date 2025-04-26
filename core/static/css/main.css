@@ -125,3 +125,7 @@ footer {
 .user-icon {
     font-size: 1.3rem;
 }
+
+.master-badge {
+    border-left: 3px solid #e67e22;
+}
