@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .data import *
+from .models import Order, Master, Service
 
 
 def landing(request):
     context = {
-        'masters': masters,
-        'services': services,
+        'masters': Master.objects.all(),
+        'services': Service.objects.all(),
     }
 
     return render(request, 'core/landing.html', context)

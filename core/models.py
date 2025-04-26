@@ -76,7 +76,7 @@ class Service(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name} - {self.price}₽ ({self.duration} мин)"
+        return f"{self.name} - {self.price}₽"
 
 class Review(models.Model):
     """Модель отзыва о мастере"""
