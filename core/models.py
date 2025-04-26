@@ -25,6 +25,8 @@ class Order(models.Model):
     date_updated = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     # Один ко многим
     master = models.ForeignKey("Master", on_delete=models.SET_NULL, null=True, related_name="orders")
+    # Многие ко многим
+    services = models.ManyToManyField("Service", verbose_name="Услуги")
     appointment_date = models.DateTimeField(blank=True, null=True, verbose_name="Дата и время записи")
 
     class Meta:
@@ -44,7 +46,7 @@ class Master(models.Model):
     photo = models.ImageField(upload_to="images/masters/", blank=True, null=True, verbose_name="Фотография")
     phone = models.CharField(max_length=20, verbose_name="Телефон")
     address = models.CharField(max_length=255, verbose_name="Адрес")
-    email = models.EmailField(blank=True)
+    email = models.EmailField(blank=True, verbose_name="Email")
     experience = models.PositiveIntegerField(verbose_name="Стаж работы", help_text="Опыт работы в годах")
     # Многие ко многим
     services = models.ManyToManyField("Service", related_name="masters")
@@ -128,3 +130,27 @@ class Review(models.Model):
         indexes = [
             models.Index(fields=['-created_at', 'rating']),
         ] # создание индекса для ускорения запросов по полям created_at и rating
+
+"""
+Таблицы базы данных - это классы Python, которые наследуются от класса models.Model.
+Каждая таблица имеет свои поля, которые определяются как атрибуты класса.
+Поля могут быть разных типов, таких как CharField, IntegerField, DateField и т.д.
+
+CharField - строка фиксированной длины (max_length - максимальная длина строки)
+IntegerField - целое
+DateField - дата
+DateTimeField - дата и время
+DecimalField - десятичное число (max_digits - максимальное количество цифр, decimal_places - количество цифр после запятой)
+BooleanField - булево значение
+ImageField - изображение (upload_to - путь для загрузки изображения)
+
+verbose_name - имя поля для отображения в админ-панели и в интерфейсе пользователя
+choices=STATUS_CHOICES - выбор из списка, который создаем сами
+blank - можно ли оставить поле пустым(пустая строка ""), 
+null - позволяет сохранить NULL в базе данных
+
+ForeignKey - связь с другой таблицей
+ManyToManyField - связь многие ко многим
+on_delete - что делать с данными, если удалить запись из связанной таблицы
+related_name - параметр, который используется в полях отношений (ForeignKey, ManyToManyField, OneToOneField) для определения имени обратной связи от связанной модели к модели, в которой определено поле.
+"""
