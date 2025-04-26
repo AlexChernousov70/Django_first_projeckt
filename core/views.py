@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .data import *
-from .models import Master, Service, Review
+from .models import Order, Master, Service, Review
 from django.contrib.auth.decorators import login_required
 
 def landing(request):
@@ -21,6 +21,8 @@ def thanks(request):
     
 @login_required
 def orders_list(request):
+
+    orders = Order.objects.all().order_by('-date_created') # получение всех объектов, сортированных по дате создания
     context = {
         'orders': orders
     }

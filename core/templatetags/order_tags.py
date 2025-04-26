@@ -5,9 +5,12 @@ register = template.Library()
 @register.filter
 def status_class(status):
     status_map = {
-        'новая': 'status-new',
-        'подтвержденная': 'status-confirmed',
-        'отмененная': 'status-cancelled',
-        'выполненная': 'status-completed'
+        'not_approved': 'bg-warning',
+        'moderated': 'bg-info',
+        'spam': 'bg-danger',
+        'approved': 'bg-success',
+        'in_awaiting': 'bg-primary',
+        'completed': 'bg-success',
+        'canceled': 'bg-secondary',
     }
-    return status_map.get(status.lower(), '')
+    return status_map.get(status, '')

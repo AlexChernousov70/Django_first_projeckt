@@ -4,14 +4,14 @@
     <h5 class="card-title text-center p-2">Заявка №{{order.id}}</h5>
     <ul class="list-group list-group-flush">
         <li class="list-group-item">{{order.client_name}}</li>
-        <li class="list-group-item">{{order.date}}</li>
+        <li class="list-group-item">{{order.date_created}}</li>
         <li class="list-group-item {{order.status|status_class}}">  <!-- Применяем класс из тега!! -->
-            <strong>{{order.status}}</strong>
+            <strong>{{order.get_status_display}}</strong> <!-- get_status_display - Этот метод автоматически создается Django для всех полей с выбором (choices) и возвращает человекочитаемое представление значения.-->
         </li>
         <li class="list-group-item">
             <ul>
-                {% for service in order.services %}  <!-- Цикл по списку услуг заказа -->
-                <li>{{service}}</li>
+                {% for service in order.services.all %}  Цикл по списку услуг заказа
+                    <li>{{service.name}}</li>
                 {% endfor %}
             </ul>
         </li>
