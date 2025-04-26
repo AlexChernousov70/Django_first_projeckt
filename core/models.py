@@ -131,6 +131,9 @@ class Review(models.Model):
             models.Index(fields=['-created_at', 'rating']),
         ] # создание индекса для ускорения запросов по полям created_at и rating
 
+    def __str__(self):
+        return f"Отзыв #{self.id} - {self.client_name} ({self.rating}★)"
+
 """
 Таблицы базы данных - это классы Python, которые наследуются от класса models.Model.
 Каждая таблица имеет свои поля, которые определяются как атрибуты класса.

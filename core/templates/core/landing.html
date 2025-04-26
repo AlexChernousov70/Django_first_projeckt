@@ -2,11 +2,21 @@
 {% block content %}
     <h1>Главная страница</h1>
     <h2>Наши мастера:</h2>
-    {% for master in masters %}
-    <p><i class="bi bi-person-fill"></i> {{ master.name }}</p>
-    {% endfor %}
+    <div>
+        {% for master in masters %}
+        <p><i class="bi bi-person-fill"></i> {{ master.name }}</p>
+        {% endfor %}
+    </div>
     <h2>Наши услуги:</h2>
-    {% for service in services %}
-        <p><i class="bi bi-check-lg text-success me-2"></i>{{ service }}</p>
-    {% endfor %}
+    <div>
+        {% for service in services %}
+            <p><i class="bi bi-check-lg text-success me-2"></i>{{ service }}</p>
+        {% endfor %}
+    </div>
+    <h2>Отзывы:</h2>
+    <div>
+        {% for review in reviews %}
+            {% include 'core/includes/review_card.html' %}
+        {% endfor %}
+    </div>
 {% endblock %}
