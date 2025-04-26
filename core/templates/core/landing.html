@@ -4,13 +4,7 @@
     <h2>Наши мастера:</h2>
     <div>
         {% for master in masters %}
-        <p><i class="bi bi-person-fill"></i> {{ master.name }}</p>
-        {% endfor %}
-    </div>
-    <h2>Наши услуги:</h2>
-    <div>
-        {% for service in services %}
-            <p><i class="bi bi-check-lg text-success me-2"></i>{{ service }}</p>
+            {% include 'core/includes/master_card.html' %}
         {% endfor %}
     </div>
     <h2>Отзывы:</h2>

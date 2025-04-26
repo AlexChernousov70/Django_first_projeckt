@@ -1,0 +1,38 @@
+{% load static %}
+<div class="card mb-4 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+    <div class="row g-0">
+        <!-- Фото мастера (левая часть) -->
+        <div class="col-md-4">
+            {% if master.photo %}
+                <img src="{{ master.photo.url }}" class="img-fluid h-100" style="object-fit: cover; min-height: 250px;" alt="{{ master.name }}">
+            {% else %}
+                <div class="d-flex align-items-center justify-content-center bg-light h-100" style="min-height: 250px;">
+                    <i class="fas fa-user-tie fa-5x text-secondary"></i>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Информация о мастере (правая часть) -->
+        <div class="col-md-8">
+            <div class="card-body h-100 d-flex flex-column">
+                <h3 class="card-title mb-3">{{ master.name }}</h3>
+                
+                <div class="mb-3">
+                    <span class="badge bg-dark text-warning fs-6 mb-2">
+                        <i class="fas fa-award me-2"></i>Стаж в годах: {{ master.experience }}</span>
+                </div>
+
+                <div class="mt-auto">
+                    <h6 class="text-muted mb-2">Предоставляемые услуги:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for service in master.services.all %}
+                            <span class="badge bg-light text-dark border">{{ service.name }}</span>
+                        {% empty %}
+                            <span class="text-muted">Нет указанных услуг</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
