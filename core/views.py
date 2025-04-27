@@ -20,50 +20,36 @@ def thanks(request):
         'masters_count': Master.objects.count(),
     }
     return render(request, 'core/thanks.html', context)
-    
+
 @login_required
 def orders_list(request):
-
-    orders = Order.objects.all().order_by('-date_created') # получение всех объектов, сортированных по дате создания
-
-    if request.method == "GET":
-        # Получаем все заказы
-        # Используем жадную загрузку для мастеров и услуг
-        # all_orders = Order.objects.prefetch_related("master", "services").all()
-        # all_orders = Order.objects.all()
-        all_orders = Order.objects.select_related("master").prefetch_related("services").all()
+    # Базовый запрос с оптимизацией
+    orders = Order.objects.select_related("master").prefetch_related("services").order_by('-date_created')
     
-        # Получаем строку поиска
-        search_query = request.GET.get("search", None)
-
-        if search_query:
-            # Получаем чекбоксы
-            check_boxes = request.GET.getlist("search_in")
-
-            # Проверяем Чекбоксы и добавляем Q объекты в запрос
-            # |= это оператор "или" для Q объектов
-            filters = Q()
-
-            if "phone" in check_boxes:
-                # Полная запись где мы увеличиваем фильтры
-                filters = filters | Q(phone__icontains=search_query)
-
-            if "name" in check_boxes:
-                # Сокращенная запись через inplace оператор
-                filters |= Q(client_name__icontains=search_query)
-            
-            if "comment" in check_boxes:
-                filters |= Q(comment__icontains=search_query)
-
-            if filters:
-                # Если фильтры появились. Если Q остался пустым, мы не попадем сюда
-                all_orders = all_orders.filter(filters)
+    # search_query - поиск по номеру телефона, имени клиента, комментарию
+    search_query = request.GET.get("search")
+    # Если есть поисковый запрос
+    if search_query:
+        # Разбиваем поисковый запрос на поля, в которых будем искать
+        search_fields = request.GET.getlist("search_in")  # Без значений по умолчанию
+        # Создаем фильтры для каждого поля
+        filters = Q()
+        if "phone" in search_fields:
+            filters |= Q(phone__icontains=search_query)
+        if "name" in search_fields:
+            filters |= Q(client_name__icontains=search_query)
+        if "comment" in search_fields:
+            filters |= Q(comment__icontains=search_query)
+        # Фильтруем заказы по фильтрам
+        orders = orders.filter(filters) if filters else orders.none()
 
     context = {
         'orders': orders,
         'is_orders_list': True
     }
     return render(request, 'core/orders_list.html', context)
+
+
 
 
 
