@@ -37,6 +37,17 @@ class Order(models.Model):
         verbose_name_plural = "Заказы" # verbose_name_plural - задаёт название модели во множественном числе. Если не указать, Django автоматически добавит "s" к verbose_name.
         ordering = ['-appointment_date'] # определяет порядок сортировки объектов модели по умолчанию. В данном случае ['-appointment_date'] означает сортировку по полю appointment_date в обратном порядке (от новых к старым).
 
+        # Создаем индексы
+        indexes = [
+            # Индекс по полю status
+            models.Index(fields=['status'], name='status_idx'),
+            # Индекс по полю date_created (хотя для сортировки он может создаться и так,
+            # но явное указание не повредит и поможет при фильтрации)
+            models.Index(fields=['date_created'], name='created_at_idx'),
+            # Пример составного индекса, если бы мы часто искали заказы мастера за период
+            # models.Index(fields=['client_name', 'phone'], name='master_created_idx'),
+        ]
+
     def __str__(self):
         return f"Заказ #{self.id} - {self.client_name} ({self.get_status_display()})"
 
