@@ -15,14 +15,12 @@
             <div class="d-flex align-items-center">
                 <div>
                     <p class="mb-0">{{ order.client_name }}</p>
-                    {% if is_orders_detail %}
-                        <p class="mb-0">{{ order.phone }}</p>
-                        <p class="mb-0">{{ order.comment }}</p>
-                    {% endif %}
+                    <p class="mb-0">{{ order.phone }}</p>
+                    <p class="mb-0">{{ order.comment }}</p>
                     <small class="text-muted">{{ order.date_created }}</small>
                     {% if is_orders_detail %}
-                        <br>
-                        <small class="text-muted"> Последнее обновление: {{ order.date_updated }}</small>
+                    <br>
+                    <small class="text-muted"> Последнее обновление: {{ order.date_updated }}</small>
                     {% endif %}
                 </div>
             </div>
