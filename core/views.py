@@ -15,7 +15,7 @@ def landing(request):
 
 def thanks(request):
     context = {
-        'masters_count': len(masters)
+        'masters_count': Master.objects.count(),
     }
     return render(request, 'core/thanks.html', context)
     
