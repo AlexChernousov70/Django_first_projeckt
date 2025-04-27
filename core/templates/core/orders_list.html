@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
     <div class="row align-items-center mb-3">
         <div class="col">
@@ -11,8 +12,6 @@
     
     <div class="row">
         {% for order in orders %}
-        <!-- Для 2 карточек в ряд используем col-md-6 -->
-        <!-- Для 3 карточек в ряд заменить на col-md-4 -->
         <div class="col-12 col-md-6 col-lg-4 mb-4">
             {% include 'core/includes/order_card.html' %}
         </div>

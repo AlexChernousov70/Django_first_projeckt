@@ -24,18 +24,18 @@ def orders_list(request):
 
     orders = Order.objects.all().order_by('-date_created') # получение всех объектов, сортированных по дате создания
     context = {
-        'orders': orders
+        'orders': orders,
+        'is_orders_list': True
     }
     return render(request, 'core/orders_list.html', context)
 
 @login_required
 def order_detail(request, order_id):
     try:
-        order = [o for o in orders if o["id"] == order_id][0]
-    except IndexError:
+        order = Order.objects.get(id=order_id) # Теперь у нас есть объект заказа, а не список
+    except Order.DoesNotExist:
         # Если заказ не найден, возвращаем 404 - данные не найдены
         return HttpResponse(status=404)
-    master_id = order["master_id"]
-    master = next(m for m in masters if m["id"] == master_id)
+    master = order.master
     context = {"order": order, "master": master, "title": f"Заказ №{order_id}"}
-    return render(request, 'order_detail.html', context)
+    return render(request, 'core/order_detail.html', context)

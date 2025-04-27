@@ -34,6 +34,10 @@
     </div>
     
     <div class="card-footer bg-transparent border-top-0 text-center">
-        <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-dark w-100">Подробнее</a>
+        {% if is_orders_list %}
+            <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-dark w-100">Подробнее</a>
+        {% else %}
+            <a href="{% url 'orders_list' %}" class="btn btn-outline-dark w-100">В каталог</a>
+        {% endif %}
     </div>
 </div>
