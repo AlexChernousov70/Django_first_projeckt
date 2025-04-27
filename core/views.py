@@ -8,8 +8,8 @@ from django.db.models import Q
 
 def landing(request):
     context = {
-        'masters': Master.objects.all(),
-        'services': Service.objects.all(),
+        'masters': Master.objects.prefetch_related('services').all(),
+        'services': Service.objects.only('id', 'name', 'price', 'duration', 'image').order_by('name'),
         'reviews': Review.objects.all(),
     }
 
