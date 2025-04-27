@@ -42,5 +42,5 @@ def order_detail(request, order_id):
         "master": master, 
         "title": f"Заказ №{order_id}",
         'is_orders_detail': True
-        }
+    }
     return render(request, 'core/order_detail.html', context)
