@@ -37,5 +37,10 @@ def order_detail(request, order_id):
         # Если заказ не найден, возвращаем 404 - данные не найдены
         return HttpResponse(status=404)
     master = order.master
-    context = {"order": order, "master": master, "title": f"Заказ №{order_id}"}
+    context = {
+        "order": order, 
+        "master": master, 
+        "title": f"Заказ №{order_id}",
+        'is_orders_detail': True
+        }
     return render(request, 'core/order_detail.html', context)

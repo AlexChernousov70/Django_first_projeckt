@@ -5,7 +5,6 @@
         <h5 class="card-title mb-0 text-center">Заявка №{{order.id}}</h5>
     </div>
     
-    <!-- Блок статуса -->
     <div class="{{order.status|status_class}} py-2 px-3">
         <strong class="d-block text-center">{{ order.get_status_display }}</strong>
     </div>
@@ -16,14 +15,31 @@
             <div class="d-flex align-items-center">
                 <div>
                     <p class="mb-0">{{ order.client_name }}</p>
+                    {% if is_orders_detail %}
+                        <p class="mb-0">{{ order.phone }}</p>
+                        <p class="mb-0">{{ order.comment }}</p>
+                    {% endif %}
                     <small class="text-muted">{{ order.date_created }}</small>
+                    {% if is_orders_detail %}
+                        <br>
+                        <small class="text-muted"> Последнее обновление: {{ order.date_updated }}</small>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        
+
+        {% if is_orders_detail %}
+        <div class="services-list">
+            <h6 class="text-muted mb-2">Мастер:</h6>
+            <div class="d-flex flex-wrap gap-3 mb-2">
+                {{ master.name }}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="services-list">
             <h6 class="text-muted mb-2">Услуги:</h6>
-            <div class="d-flex flex-wrap gap-3">
+            <div class="d-flex flex-wrap gap-3 mb-3">
                 {% for service in order.services.all %}
                     <span class="badge bg-light text-dark border text-wrap text-start" style="word-break: break-word; max-width: 100%;">
                         {{ service.name }}
@@ -31,6 +47,18 @@
                 {% endfor %}
             </div>
         </div>
+
+        {% if is_orders_detail %}
+        <div class="services-list">
+            <h6 class="text-muted mb-2">Дата и время записи:</h6>
+            <div class="d-flex flex-wrap gap-3 mb-2">
+                {{ order.appointment_date }}
+            </div>
+        </div>
+        {% endif %}
+
+        
+
     </div>
     
     <div class="card-footer bg-transparent border-top-0 text-center">
