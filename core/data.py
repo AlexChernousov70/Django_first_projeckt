@@ -8,9 +8,3 @@ MENU_ITEMS = [
         "url_name": "thanks"
     }
 ]
-
-# Статусы заявок
-STATUS_NEW = 'новая'
-STATUS_CONFIRMED = 'подтвержденная'
-STATUS_CANCELLED = 'отмененная'
-STATUS_COMPLETED = 'выполненная'
