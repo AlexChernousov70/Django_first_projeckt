@@ -139,3 +139,11 @@ footer {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
 }
+
+.user-icon {
+        font-size: 1.2rem;
+    }
+.services-list .badge {
+        white-space: normal !important;
+        line-height: 1.4;
+    }

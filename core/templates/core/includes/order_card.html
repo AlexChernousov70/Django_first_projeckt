@@ -1,23 +1,39 @@
 {% load static %}
-{% load order_tags %} <!-- Подключения тега, созданого нами -->
-<div class="card h-100">
-    <h5 class="card-title text-center p-2">Заявка №{{order.id}}</h5>
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item">{{order.client_name}}</li>
-        <li class="list-group-item">{{order.date_created}}</li>
-        <li class="list-group-item {{order.status|status_class}}">  <!-- Применяем класс из тега!! -->
-            <strong>{{order.get_status_display}}</strong> <!-- get_status_display - Этот метод автоматически создается Django для всех полей с выбором (choices) и возвращает человекочитаемое представление значения.-->
-        </li>
-        <li class="list-group-item">
-            <ul>
-                {% for service in order.services.all %}  Цикл по списку услуг заказа
-                    <li>{{service.name}}</li>
+{% load order_tags %}
+<div class="card h-100 shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+    <div class="card-header bg-dark text-white" style="border-radius: 12px 12px 0 0;">
+        <h5 class="card-title mb-0 text-center">Заявка №{{order.id}}</h5>
+    </div>
+    
+    <!-- Блок статуса -->
+    <div class="{{order.status|status_class}} py-2 px-3">
+        <strong class="d-block text-center">{{ order.get_status_display }}</strong>
+    </div>
+    
+    <div class="card-body">
+        <div class="mb-3">
+            <h6 class="text-muted mb-1">Клиент:</h6>
+            <div class="d-flex align-items-center">
+                <div>
+                    <p class="mb-0">{{ order.client_name }}</p>
+                    <small class="text-muted">{{ order.date_created }}</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="services-list">
+            <h6 class="text-muted mb-2">Услуги:</h6>
+            <div class="d-flex flex-wrap gap-3">
+                {% for service in order.services.all %}
+                    <span class="badge bg-light text-dark border text-wrap text-start" style="word-break: break-word; max-width: 100%;">
+                        {{ service.name }}
+                    </span>
                 {% endfor %}
-            </ul>
-        </li>
-    </ul>
-    <div class="card-footer mt-auto">
-        {% comment %} Кнопка с псевдонимом 'orders/<int:order_id>/', order_detail,  {% endcomment %}
-        <a href="{% url 'order_detail' order.id %}" class="btn btn-dark">Подробнее</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-footer bg-transparent border-top-0 text-center">
+        <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-dark w-100">Подробнее</a>
     </div>
 </div>
