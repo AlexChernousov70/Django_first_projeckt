@@ -10,7 +10,7 @@ def landing(request):
     context = {
         'masters': Master.objects.prefetch_related('services').all(),
         'services': Service.objects.only('id', 'name', 'price', 'duration', 'image').order_by('name'),
-        'reviews': Review.objects.all(),
+        'reviews': Review.objects.all(), # сортировка уже прописана в моделях
     }
 
     return render(request, 'core/landing.html', context)
@@ -48,25 +48,6 @@ def orders_list(request):
         'is_orders_list': True
     }
     return render(request, 'core/orders_list.html', context)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @login_required
 def order_detail(request, order_id):
