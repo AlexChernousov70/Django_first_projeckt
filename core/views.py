@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .data import *
 from .models import Order, Master, Service, Review
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-
+# messages - это встроенный модуль Django для отображения сообщений пользователю
+from django.contrib import messages
+from .forms import ServiceForm
 
 def landing(request):
     context = {
@@ -64,3 +66,12 @@ def order_detail(request, order_id):
         'is_orders_detail': True
     }
     return render(request, 'core/order_detail.html', context)
+
+def service_list(request):
+    services = Service.objects.all
+    context = {
+        'title': 'Услуги',
+        'services': services,
+    }
+    return render(request, 'core/service_list.html', context)
+
