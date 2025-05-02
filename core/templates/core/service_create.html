@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+    {% block title %} {{ title }} {% endblock %}
+
+    {% block content %}
+    <h1>Создание услуги</h1>
+    <form method="post"> <!-- указываем метод отправки форма - POST -->
+        {% csrf_token %} <!-- Обязательная защита от CSRF-атак! -->
+        {{ form.as_p }} <!-- Отображение формы с помощью метода as_p (поля в p-объектах - абзацах, есть ещё div)-->
+        
+        {% for field in form %} <!-- Циклом выводим ошибки связанные с полем-->
+            {% for error in field.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        {% for error in form.non_field_errors %} <!-- Ошибки не связанные с полями-->
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+
+        <!-- Кнопка для отправки формы на сервер -->
+        <button class="btn btn-dark" type="submit">Создать</button>
+    </form>
+    {% endblock %}
