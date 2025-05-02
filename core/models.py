@@ -69,7 +69,7 @@ class Service(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название услуги")
     description = models.TextField(verbose_name="Описание услуги")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена услуги")
-    duration = models.PositiveIntegerField(help_text="Время выполнения в минутах", verbose_name="Время выполнения услуги")
+    duration = models.PositiveIntegerField(default=20, help_text="Время выполнения в минутах", verbose_name="Время выполнения услуги")
     is_popular = models.BooleanField(default=False, verbose_name="Популярная услуга")
     image = models.ImageField(upload_to="images/services/", blank=True, null=True, verbose_name="Изображение услуги")
 
