@@ -75,3 +75,47 @@ def service_list(request):
     }
     return render(request, 'core/service_list.html', context)
 
+def service_create(request):
+    """
+    Отображаем пустую форму при GET
+    Определяем логику при отправке формы пользователем
+    """
+    # Если метод GET - возвращаем пустую форму
+    if request.method == "GET":
+        form = ServiceForm()
+        context = {
+            "title": "Создание услуги",
+            "form": form,
+        }
+        return render(request, "core/service_create.html", context)
+
+    elif request.method == "POST":
+        # Создаем форму и передаем в нее POST данные
+        form = ServiceForm(request.POST)
+
+        # Если форма валидна:
+        if form.is_valid():
+            # Получаем очищенные(проверенные, валидные) данные из формы
+            name = form.cleaned_data.get("name")
+            description = form.cleaned_data.get("description")
+            price = form.cleaned_data.get("price")
+
+            # Создаем новую услугу
+            new_service = Service.objects.create(
+                name=name,
+                description=description,
+                price=price,
+            )
+
+            # Даем пользователю уведомление об успешном создании
+            messages.success(request, f"Услуга {new_service.name} успешно создана!")
+
+            # Перенаправляем на страницу со всеми услугами
+            return redirect("service_list")
+
+        # В случае ошибок валидации Django автоматически заполнит form.errors и отобразит их в шаблоне, поэтому просто возвращаем форму
+        context = {
+            "title": "Создание услуги",
+            "form": form,
+        }
+        return render(request, "core/service_create.html", context)
