@@ -122,7 +122,7 @@ class Review(models.Model):
         verbose_name="Оценка"
     )
     is_published = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name="Опубликован"
     )
 

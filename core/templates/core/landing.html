@@ -10,7 +10,9 @@
     <h2>Отзывы:</h2>
     <div>
         {% for review in reviews %}
-            {% include 'core/includes/review_card.html' %}
+            {% if review.is_published %}
+                {% include 'core/includes/review_card.html' %}
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}
