@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success display-1 mb-4"></i>
+                    <h1 class="display-4 mb-4">Спасибо! <br>Ваш отзыв отправлен</h1>
+                    <p class="lead">
+                        Он очень важен для нас. Мы ценим ваше время и внимание.
+                    </p>
+                    <hr class="my-4">
+                    <a href="{% url 'landing' %}" class="btn btn-dark btn-lg mt-3">
+                        <i class="bi bi-house-door me-2"></i>
+                        На главную
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
