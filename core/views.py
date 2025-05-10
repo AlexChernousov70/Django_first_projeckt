@@ -141,3 +141,6 @@ def create_review(request):
         "form": form,
     }
     return render(request, "core/review_form.html", context)
+
+def thanks_for_the_review(request):
+    return render(request, 'core/thanks_for_the_review.html')
