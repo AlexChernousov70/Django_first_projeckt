@@ -1,6 +1,7 @@
 # Импорт служебных объектов Form
 from django import forms
 from django.core.exceptions import ValidationError
+from .models import Review
 
 
 class ServiceForm(forms.Form):
@@ -57,3 +58,43 @@ class ServiceForm(forms.Form):
             raise ValidationError("В описании не должно быть слова 'плохое'")
         # Важно возвращать значение поля!
         return description
+
+class ReviewForm(forms.ModelForm):
+    """Создаем форму на основе модели Review"""
+    class Meta:
+        """
+        Класс мета - в этом классе описывается модель, по которой будет строиться форма, и поля, которые будут отображаться в форме.
+        """
+        # от какой модели наследуемся
+        model = Review
+        # Поля, которые будут отображаться в форме
+        fields = ['client_name', 'text', 'rating', 'master', 'photo']
+        # Выводимые подсказки
+        widgets = {
+            'client_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ваше имя'
+            }),
+            'text': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Текст вашего отзыва',
+                'rows': 4
+            }),
+            'rating': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'master': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'photo': forms.FileInput(attrs={
+                'class': 'form-control'
+            }),
+        }
+        # Подписи к полям
+        labels = {
+            'client_name': 'Ваше имя',
+            'text': 'Текст отзыва',
+            'rating': 'Оценка',
+            'master': 'Мастер',
+            'photo': 'Фотография (необязательно)'
+        }

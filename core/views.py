@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 # messages - это встроенный модуль Django для отображения сообщений пользователю
 from django.contrib import messages
-from .forms import ServiceForm
+from .forms import ServiceForm, ReviewForm
+
 
 def landing(request):
     context = {
@@ -119,3 +120,24 @@ def service_create(request):
             "form": form,
         }
         return render(request, "core/service_create.html", context)
+
+def create_review(request):
+    """Функциональное представление для создания отзыва"""
+    if request.method == "POST":
+        form = ReviewForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Дополнительная защита от опубликования (не смотря на то, что is_published исключено из формы)
+            review = form.save(commit=False)  # Не сохраняем сразу в БД
+            review.is_published = False       # Принудительно устанавливаем значение
+
+            form.save() # Сохраняем отзыв в БД
+            messages.success(request, 'Отзыв успешно добавлен!')
+            return redirect('thanks_for_the_review')
+    else: # Если метод GET, создаем пустую форму
+        form = ReviewForm()
+
+    context = {
+        "title": "Написать отзыв",
+        "form": form,
+    }
+    return render(request, "core/review_form.html", context)
