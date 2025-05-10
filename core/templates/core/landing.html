@@ -7,6 +7,8 @@
             {% include 'core/includes/master_card.html' %}
         {% endfor %}
     </div>
+    <h3>Помогите нам стать лучше</h3> 
+    <a href="{% url 'create_review' %}" class="btn btn-dark">Оставить отзыв</a>
     <h2>Отзывы:</h2>
     <div>
         {% for review in reviews %}
