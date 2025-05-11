@@ -144,3 +144,27 @@ def create_review(request):
 
 def thanks_for_the_review(request):
     return render(request, 'core/thanks_for_the_review.html')
+
+def get_master_info(request):
+    """
+    Универсальное представление для получения информации о мастере через AJAX.
+    Возвращает данные мастера в формате JSON.
+    """
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        master_id = request.GET.get('master_id')
+        if master_id:
+            try:
+                master = Master.objects.get(pk=master_id)
+                # Формируем данные для ответа
+                master_data = {
+                    'id': master.id,
+                    'name': f"{master.name}",
+                    'experience': master.experience,
+                    'photo': master.photo.url if master.photo else None,
+                    'services': list(master.services.values('id', 'name', 'price')),
+                }
+                return JsonResponse({'success': True, 'master': master_data})
+            except Master.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Мастер не найден'})
+        return JsonResponse({'success': False, 'error': 'Не указан ID мастера'})
+    return JsonResponse({'success': False, 'error': 'Недопустимый запрос'})
