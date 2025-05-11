@@ -63,11 +63,11 @@ class ReviewForm(forms.ModelForm):
     """Создаем форму на основе модели Review"""
     rating = forms.ChoiceField(
     choices=[
-        (1, '★☆☆☆☆ (1)'),
-        (2, '★★☆☆☆ (2)'),
-        (3, '★★★☆☆ (3)'),
-        (4, '★★★★☆ (4)'),
-        (5, '★★★★★ (5)'),
+        (1, '★☆☆☆☆'),
+        (2, '★★☆☆☆'),
+        (3, '★★★☆☆'),
+        (4, '★★★★☆'),
+        (5, '★★★★★'),
     ],
     widget=forms.RadioSelect(attrs={'class': 'rating-radio'}),
     label='Оценка'
@@ -101,8 +101,8 @@ class ReviewForm(forms.ModelForm):
         }
         # Подписи к полям
         labels = {
-            'client_name': 'Ваше имя',
-            'text': 'Текст отзыва',
+            'client_name': 'Ваше имя:',
+            'text': 'Текст отзыва:',
             'rating': 'Оценка',
             'master': 'Мастер',
             'photo': 'Фотография (необязательно)'

@@ -147,3 +147,27 @@ footer {
         white-space: normal !important;
         line-height: 1.4;
     }
+
+    /* Добавьте в ваш файл стилей */
+.star-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.star-rating i {
+    font-size: 24px;
+    color: #dfdf13; /* Серый цвет для невыбранных звёзд */
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star-rating i.active,
+.star-rating i:hover {
+    color: #f38600; /* Жёлтый цвет Bootstrap (можно заменить на #fdcc0d или другой оттенок) */
+}
+
+.star-rating i:hover ~ i {
+    color: #f1f111; /* Сбрасываем цвет для последующих звёзд при hover */
+}
