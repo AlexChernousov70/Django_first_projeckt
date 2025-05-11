@@ -61,6 +61,18 @@ class ServiceForm(forms.Form):
 
 class ReviewForm(forms.ModelForm):
     """Создаем форму на основе модели Review"""
+    rating = forms.ChoiceField(
+    choices=[
+        (1, '★☆☆☆☆ (1)'),
+        (2, '★★☆☆☆ (2)'),
+        (3, '★★★☆☆ (3)'),
+        (4, '★★★★☆ (4)'),
+        (5, '★★★★★ (5)'),
+    ],
+    widget=forms.RadioSelect(attrs={'class': 'rating-radio'}),
+    label='Оценка'
+    )
+
     class Meta:
         """
         Класс мета - в этом классе описывается модель, по которой будет строиться форма, и поля, которые будут отображаться в форме.
@@ -79,9 +91,6 @@ class ReviewForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Текст вашего отзыва',
                 'rows': 4
-            }),
-            'rating': forms.Select(attrs={
-                'class': 'form-select'
             }),
             'master': forms.Select(attrs={
                 'class': 'form-select'

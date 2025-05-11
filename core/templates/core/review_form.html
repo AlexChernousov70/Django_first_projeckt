@@ -5,7 +5,7 @@
 
     {% block content %}
     <h1>{{ title }}</h1>
-    <form method="post"> <!-- указываем метод отправки форма - POST -->
+    <form method="post" enctype="multipart/form-data"> <!-- указываем метод отправки форма - POST -->
         {% csrf_token %} <!-- Обязательная защита от CSRF-атак! -->
         {{ form.as_p }} <!-- Отображение формы с помощью метода as_p (поля в p-объектах - абзацах, есть ещё div)-->
         
