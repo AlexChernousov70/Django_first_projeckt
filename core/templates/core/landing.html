@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Главная страница</h1>
+    <h2>Стань лучше</h2>
+    <a href="{% url 'create_order' %}" class="btn btn-dark">Записаться</a>
     <h2>Наши мастера:</h2>
     <div>
         {% for master in masters %}
             {% include 'core/includes/master_card.html' %}
         {% endfor %}
     </div>
-    <h3>Помогите нам стать лучше</h3> 
+    <h2>Помогите нам стать лучше</h2> 
     <a href="{% url 'create_review' %}" class="btn btn-dark">Оставить отзыв</a>
     <h2>Отзывы:</h2>
     <div>
