@@ -7,6 +7,7 @@ from django.db.models import Q
 # messages - это встроенный модуль Django для отображения сообщений пользователю
 from django.contrib import messages
 from .forms import ServiceForm, ReviewForm, OrderForm
+import json
 
 
 def landing(request):
@@ -167,21 +168,54 @@ def get_master_info(request):
     Универсальное представление для получения информации о мастере через AJAX.
     Возвращает данные мастера в формате JSON.
     """
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        master_id = request.GET.get('master_id')
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        master_id = request.GET.get("master_id")
         if master_id:
             try:
                 master = Master.objects.get(pk=master_id)
                 # Формируем данные для ответа
                 master_data = {
-                    'id': master.id,
-                    'name': f"{master.name}",
-                    'experience': master.experience,
-                    'photo': master.photo.url if master.photo else None,
-                    'services': list(master.services.values('id', 'name', 'price')),
+                    "id": master.id,
+                    "name": f"{master.first_name} {master.last_name}",
+                    "experience": master.experience,
+                    "photo": master.photo.url if master.photo else None,
+                    "services": list(master.services.values("id", "name", "price")),
                 }
-                return JsonResponse({'success': True, 'master': master_data})
+                return JsonResponse({"success": True, "master": master_data})
             except Master.DoesNotExist:
-                return JsonResponse({'success': False, 'error': 'Мастер не найден'})
-        return JsonResponse({'success': False, 'error': 'Не указан ID мастера'})
-    return JsonResponse({'success': False, 'error': 'Недопустимый запрос'})
+                return JsonResponse({"success": False, "error": "Мастер не найден"})
+        return JsonResponse({"success": False, "error": "Не указан ID мастера"})
+    return JsonResponse({"success": False, "error": "Недопустимый запрос"})
+
+def masters_services_by_id(request, master_id=None):
+    """
+    Вью для ajax запросов фронтенда, для подгрузки услуг конкретного мастера в форму
+    m2m выбора услуг
+    """
+    # Если master_id не передан в URL, пробуем получить его из POST-запроса
+    if master_id is None:
+        data = json.loads(request.body)
+        master_id = data.get("master_id")
+
+    # Получаем мастера по id
+    master = get_object_or_404(Master, id=master_id)
+
+    # Получаем услуги
+    services = master.services.all()
+
+    # Формируем ответ в виде JSON
+    response_data = []
+
+    for service in services:
+        # Добавляем в ответ id и название услуги
+        response_data.append(
+            {
+                "id": service.id,
+                "name": service.name,
+            }
+        )
+    # Возвращаем ответ в формате JSON
+    return HttpResponse(
+        json.dumps(response_data, ensure_ascii=False, indent=4),
+        content_type="application/json",
+    )
