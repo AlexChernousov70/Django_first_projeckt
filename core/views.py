@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, JsonResponse
 from .data import *
 from .models import Order, Master, Service, Review
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-# messages - это встроенный модуль Django для отображения сообщений пользователю
 from django.contrib import messages
 from .forms import ServiceForm, ReviewForm, OrderForm
 import json
@@ -14,9 +13,8 @@ def landing(request):
     context = {
         'masters': Master.objects.prefetch_related('services').all(),
         'services': Service.objects.only('id', 'name', 'price', 'duration', 'image').order_by('name'),
-        'reviews': Review.objects.all(), # сортировка уже прописана в моделях
+        'reviews': Review.objects.all(),
     }
-
     return render(request, 'core/landing.html', context)
 
 def thanks(request):
@@ -27,16 +25,11 @@ def thanks(request):
 
 @login_required
 def orders_list(request):
-    # Базовый запрос с оптимизацией
     orders = Order.objects.select_related("master").prefetch_related("services").order_by('-date_created')
     
-    # search_query - поиск по номеру телефона, имени клиента, комментарию
     search_query = request.GET.get("search")
-    # Если есть поисковый запрос
     if search_query:
-        # Разбиваем поисковый запрос на поля, в которых будем искать
-        search_fields = request.GET.getlist("search_in")  # Без значений по умолчанию
-        # Создаем фильтры для каждого поля
+        search_fields = request.GET.getlist("search_in")
         filters = Q()
         if "phone" in search_fields:
             filters |= Q(phone__icontains=search_query)
@@ -44,7 +37,6 @@ def orders_list(request):
             filters |= Q(client_name__icontains=search_query)
         if "comment" in search_fields:
             filters |= Q(comment__icontains=search_query)
-        # Фильтруем заказы по фильтрам
         orders = orders.filter(filters) if filters else orders.none()
 
     context = {
@@ -56,9 +48,8 @@ def orders_list(request):
 @login_required
 def order_detail(request, order_id):
     try:
-        order = Order.objects.get(id=order_id) # Теперь у нас есть объект заказа, а не список
+        order = Order.objects.get(id=order_id)
     except Order.DoesNotExist:
-        # Если заказ не найден, возвращаем 404 - данные не найдены
         return HttpResponse(status=404)
     master = order.master
     context = {
@@ -70,7 +61,7 @@ def order_detail(request, order_id):
     return render(request, 'core/order_detail.html', context)
 
 def service_list(request):
-    services = Service.objects.all
+    services = Service.objects.all()
     context = {
         'title': 'Услуги',
         'services': services,
@@ -78,11 +69,6 @@ def service_list(request):
     return render(request, 'core/service_list.html', context)
 
 def service_create(request):
-    """
-    Отображаем пустую форму при GET
-    Определяем логику при отправке формы пользователем
-    """
-    # Если метод GET - возвращаем пустую форму
     if request.method == "GET":
         form = ServiceForm()
         context = {
@@ -92,30 +78,21 @@ def service_create(request):
         return render(request, "core/service_create.html", context)
 
     elif request.method == "POST":
-        # Создаем форму и передаем в нее POST данные
         form = ServiceForm(request.POST)
-
-        # Если форма валидна:
         if form.is_valid():
-            # Получаем очищенные(проверенные, валидные) данные из формы
             name = form.cleaned_data.get("name")
             description = form.cleaned_data.get("description")
             price = form.cleaned_data.get("price")
 
-            # Создаем новую услугу
             new_service = Service.objects.create(
                 name=name,
                 description=description,
                 price=price,
             )
 
-            # Даем пользователю уведомление об успешном создании
             messages.success(request, f"Услуга {new_service.name} успешно создана!")
-
-            # Перенаправляем на страницу со всеми услугами
             return redirect("service_list")
 
-        # В случае ошибок валидации Django автоматически заполнит form.errors и отобразит их в шаблоне, поэтому просто возвращаем форму
         context = {
             "title": "Создание услуги",
             "form": form,
@@ -123,18 +100,15 @@ def service_create(request):
         return render(request, "core/service_create.html", context)
 
 def create_review(request):
-    """Функциональное представление для создания отзыва"""
     if request.method == "POST":
         form = ReviewForm(request.POST, request.FILES)
         if form.is_valid():
-            # Дополнительная защита от опубликования (не смотря на то, что is_published исключено из формы)
-            review = form.save(commit=False)  # Не сохраняем сразу в БД
-            review.is_published = False       # Принудительно устанавливаем значение
-
-            form.save() # Сохраняем отзыв в БД
+            review = form.save(commit=False)
+            review.is_published = False
+            form.save()
             messages.success(request, 'Отзыв успешно добавлен!')
             return redirect('thanks_for_the_review')
-    else: # Если метод GET, создаем пустую форму
+    else:
         form = ReviewForm()
 
     context = {
@@ -147,47 +121,32 @@ def thanks_for_the_review(request):
     return render(request, 'core/thanks_for_the_review.html')
 
 def masters_services_by_id(request, master_id=None):
-    """
-    Вью для ajax запросов фронтенда, для подгрузки услуг конкретного мастера в форму
-    m2m выбора услуг
-    """
-    # Если master_id не передан в URL, пробуем получить его из POST-запроса
     if master_id is None:
-        data = json.loads(request.body)
-        master_id = data.get("master_id")
+        try:
+            data = json.loads(request.body)
+            master_id = data.get("master_id")
+        except json.JSONDecodeError:
+            return HttpResponse(status=400)
 
-    # Получаем мастера по id
     master = get_object_or_404(Master, id=master_id)
-
-    # Получаем услуги
     services = master.services.all()
 
-    # Формируем ответ в виде JSON
     response_data = []
-
     for service in services:
-        # Добавляем в ответ id и название услуги
         response_data.append(
             {
                 "id": service.id,
                 "name": service.name,
             }
         )
-    # Возвращаем ответ в формате JSON
     return HttpResponse(
         json.dumps(response_data, ensure_ascii=False, indent=4),
         content_type="application/json",
     )
 
-
 def order_create(request):
-    """
-    Вью для создания заказа
-    """
     if request.method == "GET":
-        # Если метод GET - возвращаем пустую форму
         form = OrderForm()
-
         context = {
             "title": "Создание заказа",
             "form": form,
@@ -196,22 +155,13 @@ def order_create(request):
         return render(request, "core/order_form.html", context)
 
     if request.method == "POST":
-        # Создаем форму и передаем в нее POST данные
         form = OrderForm(request.POST)
-
-        # Если форма валидна:
         if form.is_valid():
-            # Сохраняем форму в БД
             form.save()
             client_name = form.cleaned_data.get("client_name")
-            # Даем пользователю уведомление об успешном создании
             messages.success(request, f"Заказ для {client_name} успешно создан!")
-
-            # Перенаправляем на страницу со всеми заказами
             return redirect("thanks")
 
-        # В случае ошибок валидации Django автоматически заполнит form.errors
-        # и отобразит их в шаблоне, поэтому просто возвращаем форму
         context = {
             "title": "Создание заказа",
             "form": form,
@@ -220,16 +170,11 @@ def order_create(request):
         return render(request, "core/order_form.html", context)
 
 def get_master_info(request):
-    """
-    Универсальное представление для получения информации о мастере через AJAX.
-    Возвращает данные мастера в формате JSON.
-    """
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         master_id = request.GET.get("master_id")
         if master_id:
             try:
                 master = Master.objects.get(pk=master_id)
-                # Формируем данные для ответа
                 master_data = {
                     "id": master.id,
                     "name": f"{master.first_name} {master.last_name}",
