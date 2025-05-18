@@ -109,7 +109,6 @@ class ReviewForm(forms.ModelForm):
         }
 
 class OrderForm(forms.ModelForm):
-    """Создаем форму на основе модели Review"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -117,37 +116,18 @@ class OrderForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             field.widget.attrs.update({"class": "form-control"})
 
+    # def save(self):
+    #     # Сохраняем объект заказа
+    #     Сюда можно вклинить логику валидации на бекенде (проверить что мастер предоставляет ВСЕ выбранные услуги)
+    #     super().save()
+
     class Meta:
-        """
-        Класс мета - в этом классе описывается модель, по которой будет строиться форма, и поля, которые будут отображаться в форме.
-        """
-        # от какой модели наследуемся
         model = Order
-        # Поля, которые будут отображаться в форме
-        fields = ['client_name', 'phone', 'comment', 'master', 'services', 'appointment_date']
-        # Выводимые подсказки
-        widgets = {
-            'client_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ваше имя'
-            }),
-            'text': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Текст вашего отзыва',
-                'rows': 4
-            }),
-            'master': forms.Select(attrs={
-                'class': 'form-select'
-            }),
-            'photo': forms.FileInput(attrs={
-                'class': 'form-control'
-            }),
-        }
-        # Подписи к полям
-        labels = {
-            'client_name': 'Ваше имя:',
-            'text': 'Текст отзыва:',
-            'rating': 'Оценка',
-            'master': 'Мастер',
-            'photo': 'Фотография (необязательно)'
-        }
+        fields = [
+            "client_name",
+            "phone",
+            "comment",
+            "master",
+            "services",
+            "appointment_date",
+        ]

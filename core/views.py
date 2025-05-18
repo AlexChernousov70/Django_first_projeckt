@@ -146,47 +146,6 @@ def create_review(request):
 def thanks_for_the_review(request):
     return render(request, 'core/thanks_for_the_review.html')
 
-def create_order(request):
-    """Функциональное представление для записи на услугу"""
-    if request.method == "POST":
-        form = OrderForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save() # Сохраняем отзыв в БД
-            messages.success(request, 'Запись оформлена!')
-            return redirect('landing')
-    else: # Если метод GET, создаем пустую форму
-        form = OrderForm()
-
-    context = {
-        "title": "Записаться",
-        "form": form,
-    }
-    return render(request, "core/order_create.html", context)
-
-def get_master_info(request):
-    """
-    Универсальное представление для получения информации о мастере через AJAX.
-    Возвращает данные мастера в формате JSON.
-    """
-    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        master_id = request.GET.get("master_id")
-        if master_id:
-            try:
-                master = Master.objects.get(pk=master_id)
-                # Формируем данные для ответа
-                master_data = {
-                    "id": master.id,
-                    "name": f"{master.first_name} {master.last_name}",
-                    "experience": master.experience,
-                    "photo": master.photo.url if master.photo else None,
-                    "services": list(master.services.values("id", "name", "price")),
-                }
-                return JsonResponse({"success": True, "master": master_data})
-            except Master.DoesNotExist:
-                return JsonResponse({"success": False, "error": "Мастер не найден"})
-        return JsonResponse({"success": False, "error": "Не указан ID мастера"})
-    return JsonResponse({"success": False, "error": "Недопустимый запрос"})
-
 def masters_services_by_id(request, master_id=None):
     """
     Вью для ajax запросов фронтенда, для подгрузки услуг конкретного мастера в форму
@@ -219,3 +178,67 @@ def masters_services_by_id(request, master_id=None):
         json.dumps(response_data, ensure_ascii=False, indent=4),
         content_type="application/json",
     )
+
+
+def order_create(request):
+    """
+    Вью для создания заказа
+    """
+    if request.method == "GET":
+        # Если метод GET - возвращаем пустую форму
+        form = OrderForm()
+
+        context = {
+            "title": "Создание заказа",
+            "form": form,
+            "button_text": "Создать",
+        }
+        return render(request, "core/order_form.html", context)
+
+    if request.method == "POST":
+        # Создаем форму и передаем в нее POST данные
+        form = OrderForm(request.POST)
+
+        # Если форма валидна:
+        if form.is_valid():
+            # Сохраняем форму в БД
+            form.save()
+            client_name = form.cleaned_data.get("client_name")
+            # Даем пользователю уведомление об успешном создании
+            messages.success(request, f"Заказ для {client_name} успешно создан!")
+
+            # Перенаправляем на страницу со всеми заказами
+            return redirect("thanks")
+
+        # В случае ошибок валидации Django автоматически заполнит form.errors
+        # и отобразит их в шаблоне, поэтому просто возвращаем форму
+        context = {
+            "title": "Создание заказа",
+            "form": form,
+            "button_text": "Создать",
+        }
+        return render(request, "core/order_form.html", context)
+
+def get_master_info(request):
+    """
+    Универсальное представление для получения информации о мастере через AJAX.
+    Возвращает данные мастера в формате JSON.
+    """
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        master_id = request.GET.get("master_id")
+        if master_id:
+            try:
+                master = Master.objects.get(pk=master_id)
+                # Формируем данные для ответа
+                master_data = {
+                    "id": master.id,
+                    "name": f"{master.first_name} {master.last_name}",
+                    "experience": master.experience,
+                    "photo": master.photo.url if master.photo else None,
+                    "services": list(master.services.values("id", "name", "price")),
+                }
+                return JsonResponse({"success": True, "master": master_data})
+            except Master.DoesNotExist:
+                return JsonResponse({"success": False, "error": "Мастер не найден"})
+        return JsonResponse({"success": False, "error": "Не указан ID мастера"})
+    return JsonResponse({"success": False, "error": "Недопустимый запрос"})
