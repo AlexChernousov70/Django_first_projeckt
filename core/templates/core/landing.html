@@ -2,7 +2,7 @@
 {% block content %}
     <h1>Главная страница</h1>
     <h2>Стань лучше</h2>
-    <a href="{% url 'create_order' %}" class="btn btn-dark">Записаться</a>
+    <a href="{% url 'order_create' %}" class="btn btn-dark">Записаться</a>
     <h2>Наши мастера:</h2>
     <div>
         {% for master in masters %}
