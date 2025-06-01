@@ -14,7 +14,9 @@ TELEGRAM_USER_ID = settings.TELEGRAM_USER_ID
 
 @receiver(post_save, sender=Order)
 def telegram_order_notification(sender, instance, created, **kwargs):
+    print(f"Сигнал получен! Создан: {created}")
     if created:
+        print("Начинаем отправку в Telegram...")
         # Если заказ создан, добываем данные 
         client_name = instance.client_name
         phone = instance.phone
@@ -33,4 +35,3 @@ def telegram_order_notification(sender, instance, created, **kwargs):
 """
         # Логика отправки сообщения в Telegram
         run(send_telegram_message(TELEGRAM_BOT_API_KEY, TELEGRAM_USER_ID, telegram_message))
-
