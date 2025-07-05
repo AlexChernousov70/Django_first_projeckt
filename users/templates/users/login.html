@@ -1,0 +1,42 @@
+{% extends 'base.html' %}  <!-- Убедитесь, что у вас есть базовый шаблон -->
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4">Вход в систему</h2>
+            
+            <form method="post" class="card p-4">
+                {% csrf_token %}
+                
+                <!-- Поля формы -->
+                <div class="mb-3">
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.username.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">Войти</button>
+            </form>
+            
+            <div class="mt-3 text-center">
+                <a href="{% url 'register' %}" class="text-muted">Нет аккаунта? Зарегистрируйтесь</a>
+                <br>
+                <a href="#" class="text-muted">Забыли пароль?</a>  <!-- Позже замените на ссылку на сброс пароля -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -37,6 +37,17 @@
         <li class="nav-item">
           <a class="nav-link active" href="{% url 'landing' %}#booking">Запись</a>
         </li>
+        
+        {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post" class="nav-item">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link nav-link">Выйти</button>
+        </form>
+        {% else %}
+            <a class="nav-item nav-link" href="{% url 'login' %}">Войти</a>
+            <a class="nav-item nav-link" href="{% url 'register' %}">Регистрация</a>
+        {% endif %}
+
         {% if user.is_staff %}  <!-- Только для персонала -->
         <li class="nav-item">
           <a class="nav-link active text-warning" href="{% url 'orders_list' %}">
