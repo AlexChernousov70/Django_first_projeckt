@@ -1,6 +1,6 @@
 # core/urls.py
 from django.urls import path
-from .views import ThanksView, ServiceListView, OrdersListView, OrderDetailView, service_create, create_review, ThanksForReviewView, order_create, get_master_info, masters_services_by_id
+from .views import ThanksView, ServiceListView, OrdersListView, OrderDetailView, ServiceCreateView, create_review, ThanksForReviewView, order_create, get_master_info, masters_services_by_id
 
 # Эти маршруты будут доступны с префиксом /barbershop/
 urlpatterns = [
@@ -9,7 +9,7 @@ urlpatterns = [
     path('orders/', OrdersListView.as_view(), name='orders_list'),
     path('orders/<int:order_id>/', OrderDetailView.as_view(), name='order_detail'),
     path('services/', ServiceListView.as_view(), name='service_list'),
-    path('services/create/', service_create, name='service_create'),
+    path('services/create/', ServiceCreateView.as_view(), name='service_create'),
     path('review/create/', create_review, name='create_review'),
     path('thanks/review/', ThanksForReviewView.as_view(), name='thanks_for_the_review'),
     path("masters_services/", masters_services_by_id, name="masters_services_by_id_ajax"),

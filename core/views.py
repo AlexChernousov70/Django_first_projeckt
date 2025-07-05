@@ -7,10 +7,10 @@ from django.db.models import Q
 from django.contrib import messages
 from .forms import ServiceForm, ReviewForm, OrderForm
 import json
-from django.contrib.auth.mixins import LoginRequiredMixin # Миксин для ограничения доступа к странице
-from django.views.generic import TemplateView, ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin # Миксин для ограничения доступа к странице
+from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from django.http import Http404
-
+from django.urls import reverse_lazy
 
 class LandingPageView(TemplateView):
     template_name = 'core/landing.html'
@@ -124,6 +124,39 @@ def service_create(request):
             "form": form,
         }
         return render(request, "core/service_create.html", context)
+
+
+class ServiceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Service
+    form_class = ServiceForm
+    template_name = 'core/service_create.html'
+    success_url = reverse_lazy('service_list')  # Используем reverse_lazy для безопасного импорта куда перенаправлять после успешного создания
+    def test_func(self):
+        """Проверка, что пользователь является staff"""
+        return self.request.user.is_staff
+
+    def get_context_data(self, **kwargs):
+        """Добавляем заголовок в контекст"""
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Создание услуги'
+        return context
+
+    def form_valid(self, form):
+        """Обработка валидной формы"""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Услуга {self.object.name} успешно создана!")
+        return response
+
+
+
+
+
+
+
+
+
+
+
 
 def create_review(request):
     if request.method == "POST":
