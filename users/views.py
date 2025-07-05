@@ -1,3 +1,53 @@
-from django.shortcuts import render
+from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.contrib import messages
+from .forms import LoginForm, RegisterForm
 
-# Create your views here.
+class UserLoginView(LoginView):
+    template_name = 'users/login.html'
+    form_class = LoginForm
+    redirect_authenticated_user = True  # Перенаправлять уже авторизованных пользователей
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'Добро пожаловать, {form.get_user().username}!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Ошибка входа. Проверьте имя пользователя и пароль.')
+        return super().form_invalid(form)
+    
+    def get_success_url(self):
+        next_url = self.request.GET.get('next')
+        return next_url if next_url else reverse_lazy('landing')
+    
+class UserLogoutView(LogoutView):
+    template_name = 'users/logout.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.info(request, 'Вы успешно вышли из системы.')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_next_page(self):
+        return reverse_lazy('landing')
+    
+from django.contrib.auth import login
+
+class UserRegisterView(CreateView):
+    form_class = RegisterForm
+    template_name = 'users/register.html'
+    success_url = reverse_lazy('landing')
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = form.save()
+        login(self.request, user)  # Автоматический вход после регистрации
+        messages.success(self.request, 'Регистрация прошла успешно! Добро пожаловать!')
+        return response
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.warning(request, 'Вы уже авторизованы!')
+            return redirect('landing')
+        return super().dispatch(request, *args, **kwargs)
