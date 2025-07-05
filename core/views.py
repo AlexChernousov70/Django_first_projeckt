@@ -8,7 +8,9 @@ from django.contrib import messages
 from .forms import ServiceForm, ReviewForm, OrderForm
 import json
 from django.contrib.auth.mixins import LoginRequiredMixin # Миксин для ограничения доступа к странице
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
+from django.http import Http404
+
 
 class LandingPageView(TemplateView):
     template_name = 'core/landing.html'
@@ -60,20 +62,27 @@ class OrdersListView(LoginRequiredMixin, ListView):
         context['is_orders_list'] = True
         return context
 
-@login_required
-def order_detail(request, order_id):
-    try:
-        order = Order.objects.get(id=order_id)
-    except Order.DoesNotExist:
-        return HttpResponse(status=404)
-    master = order.master
-    context = {
-        "order": order, 
-        "master": master, 
-        "title": f"Заказ №{order_id}",
-        'is_orders_detail': True
-    }
-    return render(request, 'core/order_detail.html', context)
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = 'core/order_detail.html'
+    context_object_name = 'order'
+    pk_url_kwarg = 'order_id'  # Используем order_id из URL вместо pk по умолчанию, нужнен для корректной работы с параметром order_id
+
+    def get_object(self, queryset=None):
+        try:
+            return super().get_object(queryset)
+        except Order.DoesNotExist:
+            raise Http404("Заказ не найден")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.object
+        context.update({
+            'master': order.master,
+            'title': f'Заказ №{order.id}',
+            'is_orders_detail': True
+        })
+        return context
 
 class ServiceListView(ListView):
     model = Service
@@ -134,8 +143,8 @@ def create_review(request):
     }
     return render(request, "core/review_form.html", context)
 
-def thanks_for_the_review(request):
-    return render(request, 'core/thanks_for_the_review.html')
+class ThanksForReviewView(TemplateView):
+    template_name = 'core/thanks_for_the_review.html'
 
 def masters_services_by_id(request, master_id=None):
     if master_id is None:
