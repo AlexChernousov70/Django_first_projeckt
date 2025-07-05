@@ -30,6 +30,7 @@ urlpatterns = [
     path("", LandingPageView.as_view(), name="landing"),
     # Подключаем маршруты из приложения core
     path('barbershop/', include('core.urls')),
+    path('users/', include('users.urls')),
 ]
 
 if settings.DEBUG:
