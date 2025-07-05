@@ -11,6 +11,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin #
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from django.http import Http404
 from django.urls import reverse_lazy, reverse
+from django.views import View
+from django.core.exceptions import ObjectDoesNotExist
+
 
 class LandingPageView(TemplateView):
     template_name = 'core/landing.html'
@@ -218,21 +221,49 @@ class OrderCreateView(CreateView):
             
         return response
 
-def get_master_info(request):
-    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+class MasterInfoAjaxView(View):
+    """AJAX-представление для получения информации о мастере"""
+    
+    def get(self, request, *args, **kwargs):
+        # Проверка AJAX-запроса
+        if not request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": False,
+                "error": "Только AJAX-запросы разрешены"
+            }, status=400)
+
+        # Получение master_id
         master_id = request.GET.get("master_id")
-        if master_id:
-            try:
-                master = Master.objects.get(pk=master_id)
-                master_data = {
-                    "id": master.id,
-                    "name": f"{master.first_name} {master.last_name}",
-                    "experience": master.experience,
-                    "photo": master.photo.url if master.photo else None,
-                    "services": list(master.services.values("id", "name", "price")),
-                }
-                return JsonResponse({"success": True, "master": master_data})
-            except Master.DoesNotExist:
-                return JsonResponse({"success": False, "error": "Мастер не найден"})
-        return JsonResponse({"success": False, "error": "Не указан ID мастера"})
-    return JsonResponse({"success": False, "error": "Недопустимый запрос"})
+        if not master_id:
+            return JsonResponse({
+                "success": False,
+                "error": "Не указан ID мастера"
+            }, status=400)
+
+        # Получение данных мастера
+        try:
+            master = Master.objects.prefetch_related('services').get(pk=master_id)
+            return JsonResponse({
+                "success": True,
+                "master": self._serialize_master(master)
+            })
+        except ObjectDoesNotExist:
+            return JsonResponse({
+                "success": False,
+                "error": "Мастер не найден"
+            }, status=404)
+
+    def _serialize_master(self, master):
+        """Сериализация данных мастера"""
+        return {
+            "id": master.id,
+            "name": f"{master.first_name} {master.last_name}",
+            "experience": master.experience,
+            "photo": master.photo.url if master.photo else None,
+            "services": list(
+                master.services.values("id", "name", "price")
+            ),
+            "specialization": master.get_specialization_display() 
+            if hasattr(master, 'get_specialization_display')
+            else None,
+        }
