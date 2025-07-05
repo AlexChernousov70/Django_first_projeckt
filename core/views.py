@@ -10,7 +10,7 @@ import json
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin # Миксин для ограничения доступа к странице
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from django.http import Http404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 class LandingPageView(TemplateView):
     template_name = 'core/landing.html'
@@ -94,38 +94,6 @@ class ServiceListView(ListView):
         context['title'] = 'Услуги' # Добавляем свои данные в контекст
         return context
 
-def service_create(request):
-    if request.method == "GET":
-        form = ServiceForm()
-        context = {
-            "title": "Создание услуги",
-            "form": form,
-        }
-        return render(request, "core/service_create.html", context)
-
-    elif request.method == "POST":
-        form = ServiceForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data.get("name")
-            description = form.cleaned_data.get("description")
-            price = form.cleaned_data.get("price")
-
-            new_service = Service.objects.create(
-                name=name,
-                description=description,
-                price=price,
-            )
-
-            messages.success(request, f"Услуга {new_service.name} успешно создана!")
-            return redirect("service_list")
-
-        context = {
-            "title": "Создание услуги",
-            "form": form,
-        }
-        return render(request, "core/service_create.html", context)
-
-
 class ServiceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Service
     form_class = ServiceForm
@@ -147,34 +115,52 @@ class ServiceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         messages.success(self.request, f"Услуга {self.object.name} успешно создана!")
         return response
 
+class ReviewCreateView(CreateView):
+    model = Review
+    form_class = ReviewForm
+    template_name = 'core/review_form.html'
+    success_url = reverse_lazy('thanks_for_the_review')
 
+    def get_context_data(self, **kwargs):
+        """Добавляем заголовок в контекст"""
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Написать отзыв'
+        return context
 
+    def form_valid(self, form):
+        """Объединенная логика для AJAX и обычных запросов"""
+        # Сохраняем отзыв с is_published=False
+        review = form.save(commit=False)
+        review.is_published = False
+        self.object = form.save()
+        
+        # Добавляем сообщение
+        messages.success(self.request, 'Отзыв успешно добавлен!')
+        
+        # Обработка AJAX
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'Отзыв успешно добавлен!'
+            })
+            
+        return super().form_valid(form)
 
+    def form_invalid(self, form):
+        """Обработка невалидной формы для AJAX"""
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors
+            }, status=400)
+        return super().form_invalid(form)
 
-
-
-
-
-
-
-
-def create_review(request):
-    if request.method == "POST":
-        form = ReviewForm(request.POST, request.FILES)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.is_published = False
-            form.save()
-            messages.success(request, 'Отзыв успешно добавлен!')
-            return redirect('thanks_for_the_review')
-    else:
-        form = ReviewForm()
-
-    context = {
-        "title": "Написать отзыв",
-        "form": form,
-    }
-    return render(request, "core/review_form.html", context)
+    def get_initial(self):
+        """Предзаполнение поля master из GET-параметра"""
+        initial = super().get_initial()
+        if 'master_id' in self.request.GET:
+            initial['master'] = self.request.GET.get('master_id')
+        return initial
 
 class ThanksForReviewView(TemplateView):
     template_name = 'core/thanks_for_the_review.html'
@@ -203,30 +189,34 @@ def masters_services_by_id(request, master_id=None):
         content_type="application/json",
     )
 
-def order_create(request):
-    if request.method == "GET":
-        form = OrderForm()
-        context = {
-            "title": "Создание заказа",
-            "form": form,
-            "button_text": "Создать",
-        }
-        return render(request, "core/order_form.html", context)
+class OrderCreateView(CreateView):
+    form_class = OrderForm
+    template_name = 'core/order_form.html'
 
-    if request.method == "POST":
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
-            client_name = form.cleaned_data.get("client_name")
-            messages.success(request, f"Заказ для {client_name} успешно создан!")
-            return redirect("thanks")
+    def get_success_url(self):
+        """Перенаправление на страницу благодарности с параметром source='order'"""
+        return reverse('thanks') + '?source=order'
 
-        context = {
-            "title": "Создание заказа",
-            "form": form,
-            "button_text": "Создать",
-        }
-        return render(request, "core/order_form.html", context)
+    def get_context_data(self, **kwargs):
+        """Добавление дополнительного контекста"""
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Создание заказа',
+            'button_text': 'Создать'
+        })
+        return context
+
+    def form_valid(self, form):
+        """Обработка валидной формы"""
+        response = super().form_valid(form)
+        client_name = form.cleaned_data.get('client_name')
+        messages.success(self.request, f'Заказ для {client_name} успешно создан!')
+        
+        # Если реализованы уведомления (как в HW43)
+        if hasattr(self, 'send_telegram_notification'):
+            self.send_telegram_notification()
+            
+        return response
 
 def get_master_info(request):
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
