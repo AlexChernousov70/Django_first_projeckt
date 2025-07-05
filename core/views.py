@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from .data import *
 from .models import Order, Master, Service, Review
 from django.contrib.auth.decorators import login_required
@@ -168,29 +168,42 @@ class ReviewCreateView(CreateView):
 class ThanksForReviewView(TemplateView):
     template_name = 'core/thanks_for_the_review.html'
 
-def masters_services_by_id(request, master_id=None):
-    if master_id is None:
+class MastersServicesAjaxView(View):
+    """AJAX-представление для получения услуг мастера"""
+    
+    def get(self, request, master_id=None):
+        """Обработка GET-запросов"""
+        master_id = master_id or request.GET.get('master_id')
+        return self._process_request(master_id)
+
+    def post(self, request, master_id=None):
+        """Обработка POST-запросов"""
         try:
             data = json.loads(request.body)
-            master_id = data.get("master_id")
+            master_id = master_id or data.get('master_id')
+            return self._process_request(master_id)
         except json.JSONDecodeError:
-            return HttpResponse(status=400)
+            return HttpResponseBadRequest("Invalid JSON data")
 
-    master = get_object_or_404(Master, id=master_id)
-    services = master.services.all()
+    def _process_request(self, master_id):
+        """Общая логика обработки запроса"""
+        if not master_id:
+            return HttpResponseBadRequest("Master ID is required")
 
-    response_data = []
-    for service in services:
-        response_data.append(
+        master = get_object_or_404(Master, id=master_id)
+        services = master.services.only('id', 'name').all()
+        
+        response_data = [
             {
                 "id": service.id,
                 "name": service.name,
+                "price": service.price,  # Добавил цену, если нужна
+                "duration": service.duration  # И длительность, если требуется
             }
-        )
-    return HttpResponse(
-        json.dumps(response_data, ensure_ascii=False, indent=4),
-        content_type="application/json",
-    )
+            for service in services
+        ]
+        
+        return JsonResponse(response_data, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
 
 class OrderCreateView(CreateView):
     form_class = OrderForm
