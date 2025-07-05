@@ -1,10 +1,11 @@
 # core/urls.py
 from django.urls import path
-from .views import thanks, orders_list, order_detail, service_list, service_create, create_review, thanks_for_the_review, order_create, get_master_info, masters_services_by_id
+from .views import ThanksView, orders_list, order_detail, service_list, service_create, create_review, thanks_for_the_review, order_create, get_master_info, masters_services_by_id
 
 # Эти маршруты будут доступны с префиксом /barbershop/
 urlpatterns = [
-    path('thanks/', thanks, name='thanks'),
+
+    path('thanks/', ThanksView.as_view(), name="thanks"),
     path('orders/', orders_list, name='orders_list'),
     path('orders/<int:order_id>/', order_detail, name='order_detail'),
     path('services/', service_list, name='service_list'),

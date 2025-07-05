@@ -8,20 +8,29 @@ from django.contrib import messages
 from .forms import ServiceForm, ReviewForm, OrderForm
 import json
 
+from django.views.generic import TemplateView, ListView
 
-def landing(request):
-    context = {
-        'masters': Master.objects.prefetch_related('services').all(),
-        'services': Service.objects.only('id', 'name', 'price', 'duration', 'image').order_by('name'),
-        'reviews': Review.objects.all(),
-    }
-    return render(request, 'core/landing.html', context)
+class LandingPageView(TemplateView):
+    template_name = 'core/landing.html'
 
-def thanks(request):
-    context = {
-        'masters_count': Master.objects.count(),
-    }
-    return render(request, 'core/thanks.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'masters': Master.objects.prefetch_related('services').all(),
+            'services': Service.objects.only('id', 'name', 'price', 'duration', 'image').order_by('name'),
+            'reviews': Review.objects.all(),
+        })
+        return context
+    
+class ThanksView(TemplateView):
+    template_name = 'core/thanks.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['masters_count'] = Master.objects.count()
+        return context
+
+
 
 @login_required
 def orders_list(request):
