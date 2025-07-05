@@ -87,14 +87,24 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         })
         return context
 
-class ServiceListView(ListView):
+class ServiceListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Service
     template_name = 'core/service_list.html'
-    context_object_name = 'services' # Автоматически добавит 'services' в контекст
+    context_object_name = 'services'
+    
+    def test_func(self):
+        """Проверка, что пользователь является staff"""
+        return self.request.user.is_staff
+    
+    def handle_no_permission(self):
+        """Действие при отказе в доступе"""
+        messages.error(self.request, "Доступ разрешен только для администраторов")
+        return redirect('landing')
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs) # Получаем стандартный контекст от ListView, например 'object_list'
-        context['title'] = 'Услуги' # Добавляем свои данные в контекст
+        """Добавляем заголовок в контекст"""
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Услуги'
         return context
 
 class ServiceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
