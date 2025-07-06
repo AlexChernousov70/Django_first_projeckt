@@ -1,9 +1,8 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _ # импортируем функцию для перевода текста
-from django.contrib.auth import get_user_model
 
 
 User = get_user_model()
@@ -137,3 +136,16 @@ def clean_password1(self):
         raise ValidationError("Пароль не должен совпадать с логином")
     
     return password1
+
+class UserProfileUpdateForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')  # Поля для редактирования
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Убираем help_text для username
+        self.fields['username'].help_text = None
+        # Стилизация полей Bootstrap
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})

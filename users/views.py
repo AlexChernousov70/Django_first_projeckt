@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import CreateView, DetailView
-from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView, UpdateView
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth import login
@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from .forms import UserProfileUpdateForm
 
 
 class UserLoginView(LoginView):
@@ -88,3 +89,19 @@ class UserProfileDetailView(LoginRequiredMixin, DetailView):
         if user != self.request.user:
             raise PermissionDenied("Вы можете просматривать только свой профиль.")
         return user
+
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = UserProfileUpdateForm
+    template_name = 'users/profile_update_form.html'
+    success_url = reverse_lazy('profile_detail')  # Перенаправление после успешного обновления
+
+    def get_object(self, queryset=None):
+        return self.request.user  # Редактируем текущего пользователя
+
+    def form_valid(self, form):
+        if not any(m.message == 'Профиль успешно обновлён!' for m in messages.get_messages(self.request)): # Проверяем, что сообщение еще не было добавлено
+            messages.success(self.request, 'Профиль успешно обновлён!')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('profile_detail', kwargs={'pk': self.request.user.pk})
