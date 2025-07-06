@@ -3,6 +3,9 @@ from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import LoginForm, RegisterForm
+from django.contrib.auth import login
+from django.shortcuts import redirect
+
 
 class UserLoginView(LoginView):
     template_name = 'users/login.html'
@@ -18,6 +21,9 @@ class UserLoginView(LoginView):
         return super().form_invalid(form)
     
     def get_success_url(self):
+        """
+        этот метод определяет URL, на который будет выполнено перенаправление после успешного входа в систему.
+        """
         next_url = self.request.GET.get('next')
         return next_url if next_url else reverse_lazy('landing')
     
@@ -32,8 +38,6 @@ class UserLogoutView(LogoutView):
     def get_next_page(self):
         return reverse_lazy('landing')
     
-from django.contrib.auth import login
-
 class UserRegisterView(CreateView):
     form_class = RegisterForm
     template_name = 'users/register.html'

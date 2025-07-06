@@ -43,24 +43,28 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             {{ form.password1 }}
-                            {{ form.password1.errors }}
+                            {% if form.password1.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {% for error in form.password1.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             {{ form.password2 }}
-                            {{ form.password2.errors }}
+                            {% if form.password2.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {% for error in form.password2.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                
-                <!-- Капча (если добавили) -->
-                {% if form.captcha %}
-                <div class="mb-3">
-                    {{ form.captcha }}
-                    {{ form.captcha.errors }}
-                </div>
-                {% endif %}
                 
                 <button type="submit" class="btn btn-success w-100">Зарегистрироваться</button>
             </form>
@@ -72,3 +76,4 @@
     </div>
 </div>
 {% endblock %}
+

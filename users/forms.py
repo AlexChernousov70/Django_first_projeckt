@@ -100,6 +100,10 @@ class RegisterForm(UserCreationForm):
             'class': 'form-control',
             'placeholder': 'Повторите пароль'
         })
+        self.fields['password2'].error_messages = {
+            'password_mismatch': 'Пароли не совпадают. Пожалуйста, введите одинаковые пароли в оба поля.', 'required': 'Это поле обязательно для заполнения'
+        }
+
         # Убираем help_text
         for field_name in ['username', 'password1', 'password2']:
             self.fields[field_name].help_text = None
@@ -114,8 +118,8 @@ class RegisterForm(UserCreationForm):
     def clean_password1(self):
         """Дополнительная валидация пароля"""
         password1 = self.cleaned_data.get('password1')
-        if len(password1) < 8:
-            raise ValidationError("Пароль должен содержать минимум 8 символов")
         if password1.isdigit():
             raise ValidationError("Пароль не может состоять только из цифр")
+        if password1.lower() == self.cleaned_data.get('username', '').lower():
+            raise ValidationError("Пароль не должен совпадать с логином")
         return password1
