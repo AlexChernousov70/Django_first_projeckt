@@ -158,3 +158,17 @@ AUTHENTICATION_BACKENDS = [
     'users.backends.EmailOrUsernameModelBackend',
     'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд на случай чего
 ]
+
+# AUTH_USER_MODEL = "users.User"
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # эта настройка указывает Django, куда отправлять письма. В данном случае — выводить их в консоль (терминал), а не отправлять реально. EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # альтернативная отправка 
+EMAIL_HOST = 'smtp.mail.ru' # Указывает адрес SMTP-сервера для отправки писем (например, smtp.gmail.com для Gmail или smtp.mail.ru для Mail.ru) Без этого Django не знает, куда подключаться для отправки почты.
+EMAIL_PORT = 587 # Задаёт порт SMTP-сервера. Почему 587? Это стандартный порт для защищённого соединения с TLS. Альтернатива: порт 465 для SSL (устаревший, но иногда используется).
+EMAIL_USE_SSL = True # Включает шифрование соединения с SMTP-сервером через протокол TLS. защищает данные (логин, пароль, содержимое письма) от перехвата.
+
+# Логин и пароль от почтового ящика, который Django будет использовать для отправки писем.
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_LOGIN') 
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_LOGIN') # Указывает email-адрес, который будет отображаться как отправитель в письмах.
+SERVER_EMAIL = os.getenv('EMAIL_HOST_LOGIN')
+EMAIL_ADMIN = os.getenv('EMAIL_HOST_LOGIN')
