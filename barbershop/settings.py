@@ -150,7 +150,11 @@ INTERNAL_IPS = [
 TELEGRAM_BOT_API_KEY = os.getenv('TELEGRAM_BOT_API_KEY')
 TELEGRAM_USER_ID = os.getenv('TELEGRAM_USER_ID')
 
-# Добавьте в конец файла:
 LOGIN_URL = '/users/login/' # перенаправление на страницу входа при попытке доступа к защищенной странице без авторизации
 LOGIN_REDIRECT_URL = 'landing'  # перенаправление на страницу после успешной авторизации
 LOGOUT_REDIRECT_URL = 'landing' # перенаправление на страницу после выхода из аккаунта
+
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд на случай чего
+]

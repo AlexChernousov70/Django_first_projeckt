@@ -6,14 +6,24 @@ from .forms import LoginForm, RegisterForm
 from django.contrib.auth import login
 from django.shortcuts import redirect
 
-
 class UserLoginView(LoginView):
     template_name = 'users/login.html'
     form_class = LoginForm
+    authentication_form = LoginForm  # Указываем нашу кастомную форму
     redirect_authenticated_user = True  # Перенаправлять уже авторизованных пользователей
     
     def form_valid(self, form):
-        messages.success(self.request, f'Добро пожаловать, {form.get_user().username}!')
+        # Получаем username/email, который ввел пользователь
+        username = form.cleaned_data.get('username')
+        # Находим пользователя для приветствия
+        try:
+            user = User.objects.get(
+                models.Q(username__iexact=username) | 
+                models.Q(email__iexact=username)
+            )
+            messages.success(self.request, f'Добро пожаловать, {user.username}!')
+        except:
+            messages.success(self.request, 'Добро пожаловать!')
         return super().form_valid(form)
     
     def form_invalid(self, form):

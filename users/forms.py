@@ -3,6 +3,8 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _ # импортируем функцию для перевода текста
+from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
@@ -10,6 +12,15 @@ class LoginForm(AuthenticationForm):
     """
     Кастомная форма входа
     """
+    username = forms.CharField(
+        label='Логин или Email',
+        widget=forms.TextInput(attrs={
+            'autofocus': True,
+            'class': 'form-control',
+            'placeholder': 'Введите логин или email'
+        })
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Добавляем классы Bootstrap ко всем полям
@@ -46,7 +57,6 @@ class LoginForm(AuthenticationForm):
             'placeholder': 'Введите пароль'
         }),
     )
-
 
 class RegisterForm(UserCreationForm):
     """
