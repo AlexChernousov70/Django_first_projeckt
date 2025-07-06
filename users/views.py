@@ -41,12 +41,18 @@ class UserLogoutView(LogoutView):
     template_name = 'users/logout.html'
     
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
+        response = super().dispatch(request, *args, **kwargs)
+        if request.user.is_authenticated: # гарантирует, что сообщение добавится после выхода пользователя из системы
             messages.info(request, 'Вы успешно вышли из системы.')
-        return super().dispatch(request, *args, **kwargs)
+        return response
     
     def get_next_page(self):
-        return reverse_lazy('landing')
+        next_url = self.request.GET.get('next')
+        return next_url if next_url else reverse_lazy('landing')
+    
+def get_next_page(self):
+    next_url = self.request.GET.get('next')
+    return next_url if next_url else reverse_lazy('landing') # Это позволит поддерживать перенаправление после выхода, если в URL был передан next
     
 class UserRegisterView(CreateView):
     form_class = RegisterForm
