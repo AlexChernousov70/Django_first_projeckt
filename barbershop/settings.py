@@ -172,3 +172,5 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_LOGIN') # Указывает email-адрес, который будет отображаться как отправитель в письмах.
 SERVER_EMAIL = os.getenv('EMAIL_HOST_LOGIN')
 EMAIL_ADMIN = os.getenv('EMAIL_HOST_LOGIN')
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
