@@ -125,11 +125,15 @@ class RegisterForm(UserCreationForm):
             raise ValidationError("Пользователь с таким email уже существует")
         return email
 
-    def clean_password1(self):
-        """Дополнительная валидация пароля"""
-        password1 = self.cleaned_data.get('password1')
-        if password1.isdigit():
-            raise ValidationError("Пароль не может состоять только из цифр")
-        if password1.lower() == self.cleaned_data.get('username', '').lower():
-            raise ValidationError("Пароль не должен совпадать с логином")
-        return password1
+def clean_password1(self):
+    """Дополнительная валидация пароля"""
+    password1 = self.cleaned_data.get('password1')
+    if not password1:
+        raise ValidationError("Пароль не может быть пустым")
+    if password1.isdigit():
+        raise ValidationError("Пароль не может состоять только из цифр")
+    username = self.cleaned_data.get('username', '')
+    if username and password1.lower() == username.lower():
+        raise ValidationError("Пароль не должен совпадать с логином")
+    
+    return password1
