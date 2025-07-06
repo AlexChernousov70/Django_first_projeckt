@@ -1,10 +1,14 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth import login
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+
 
 class UserLoginView(LoginView):
     template_name = 'users/login.html'
@@ -71,3 +75,16 @@ class UserRegisterView(CreateView):
             messages.warning(request, 'Вы уже авторизованы!')
             return redirect('landing')
         return super().dispatch(request, *args, **kwargs)
+    
+
+class UserProfileDetailView(LoginRequiredMixin, DetailView):
+    model = User  # Используем стандартную модель User
+    template_name = 'users/profile_detail.html'
+    context_object_name = 'profile_user'
+
+    def get_object(self, queryset=None):
+        """Проверяем, что пользователь запрашивает свой профиль."""
+        user = super().get_object(queryset)
+        if user != self.request.user:
+            raise PermissionDenied("Вы можете просматривать только свой профиль.")
+        return user

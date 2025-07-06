@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Ваш профиль</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th>Логин:</th>
+                            <td>{{ profile_user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ profile_user.email }}</td>
+                        </tr>
+                        {% if profile_user.first_name %}
+                            <tr>
+                                <th>Имя:</th>
+                                <td>{{ profile_user.first_name }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if profile_user.last_name %}
+                            <tr>
+                                <th>Фамилия:</th>
+                                <td>{{ profile_user.last_name }}</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+
+                    {% comment %}<a href="{% url 'profile_update_form' %}" class="btn btn-primary">Редактировать</a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
