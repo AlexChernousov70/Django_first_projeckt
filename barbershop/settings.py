@@ -154,7 +154,7 @@ LOGIN_REDIRECT_URL = 'landing'  # перенаправление на стран
 LOGOUT_REDIRECT_URL = 'landing' # перенаправление на страницу после выхода из аккаунта
 
 AUTHENTICATION_BACKENDS = [
-    'users.backends.EmailOrUsernameModelBackend',
+    #'users.backends.EmailOrUsernameModelBackend',
     'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд на случай чего
 ]
 
