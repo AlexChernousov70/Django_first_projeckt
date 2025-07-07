@@ -1,151 +1,140 @@
+"""Формы для работы с пользователями: аутентификация, регистрация, профиль."""
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _ # импортируем функцию для перевода текста
-
 
 User = get_user_model()
 
-class LoginForm(AuthenticationForm):
-    """
-    Кастомная форма входа
-    """
-    username = forms.CharField(
-        label='Логин или Email',
-        widget=forms.TextInput(attrs={
-            'autofocus': True,
-            'class': 'form-control',
-            'placeholder': 'Введите логин или email'
-        })
-    )
-
+class UserLoginForm(AuthenticationForm):
+    """Форма для входа пользователя в систему."""
     def __init__(self, *args, **kwargs):
+        """Инициализация формы входа: настройка полей."""
         super().__init__(*args, **kwargs)
-        # Добавляем классы Bootstrap ко всем полям
-        for field_name, field in self.fields.items():
-            field.widget.attrs.update({
-                'class': 'form-control',
-                'placeholder': field.label
-            })
-            field.label = ''  # Убираем стандартные лейблы
-
-    error_messages = {
-        'invalid_login': _(
-            "Неверное имя пользователя или пароль. "
-            "Учтите, что оба поля могут быть чувствительны к регистру."
-        ),
-        'inactive': _("Этот аккаунт неактивен."),
-    }
-
-    username = forms.CharField(
-        label='Логин или Email',
-        widget=forms.TextInput(attrs={
-            'autofocus': True,
-            'class': 'form-control',
-            'placeholder': 'Введите логин или email'
-        })
-    )
-
-    password = forms.CharField(
-        label="Пароль",
-        strip=False,
-        widget=forms.PasswordInput(attrs={
-            'autocomplete': 'current-password',
-            'class': 'form-control',
-            'placeholder': 'Введите пароль'
-        }),
-    )
-
-class RegisterForm(UserCreationForm):
-    """
-    Кастомная форма регистрации
-    """
-    email = forms.EmailField(
-        required=True,
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Введите ваш email'
-        }),
-        label='Email'
-    )
-
-    first_name = forms.CharField(
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Ваше имя'
-        }),
-        label='Имя'
-    )
-
-    last_name = forms.CharField(
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Ваша фамилия'
-        }),
-        label='Фамилия'
-    )
-
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
-        
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Кастомизация полей
+        # Кастомизация поля username
         self.fields['username'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Придумайте логин'
+            'class': 'form-control mb-2',
+            'placeholder': 'Имя пользователя или email'
         })
-        self.fields['password1'].widget.attrs.update({
+        # Кастомизация поля password
+        self.fields['password'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Придумайте пароль'
+            'placeholder': 'Пароль'
         })
-        self.fields['password2'].widget.attrs.update({
+
+class CustomSetPasswordForm(SetPasswordForm):
+    """Кастомная форма для сброса пароля."""
+    def __init__(self, *args, **kwargs):
+        """Инициализация формы сброса пароля: настройка полей."""
+        super().__init__(*args, **kwargs)
+        # Кастомизация поля new_password1
+        self.fields['new_password1'].widget.attrs.update({
+            'class': 'form-control mb-2',
+            'placeholder': 'Новый пароль'
+        })
+        # Кастомизация поля new_password2
+        self.fields['new_password2'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Повторите пароль'
+            'placeholder': 'Подтвердите новый пароль'
         })
-        self.fields['password2'].error_messages = {
-            'password_mismatch': 'Пароли не совпадают. Пожалуйста, введите одинаковые пароли в оба поля.', 'required': 'Это поле обязательно для заполнения'
-        }
+            
+        # Сброс help_text для полей пароля
+        for field_name in ('new_password1', 'new_password2'):
+            if self.fields.get(field_name):
+                # Сбрасываем подсказки (help_text)
+                self.fields[field_name].help_text = ''
 
-        # Убираем help_text
-        for field_name in ['username', 'password1', 'password2']:
-            self.fields[field_name].help_text = None
 
-    def clean_email(self):
-        """Валидация уникальности email"""
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise ValidationError("Пользователь с таким email уже существует")
-        return email
 
-def clean_password1(self):
-    """Дополнительная валидация пароля"""
-    password1 = self.cleaned_data.get('password1')
-    if not password1:
-        raise ValidationError("Пароль не может быть пустым")
-    if password1.isdigit():
-        raise ValidationError("Пароль не может состоять только из цифр")
-    username = self.cleaned_data.get('username', '')
-    if username and password1.lower() == username.lower():
-        raise ValidationError("Пароль не должен совпадать с логином")
-    
-    return password1
+class UserRegisterForm(UserCreationForm):
+    """Форма для регистрации нового пользователя."""
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Email'}),
+        required=True
+    )
 
-class UserProfileUpdateForm(UserChangeForm):
     class Meta:
         model = User
-        fields = ('username', 'email', 'avatar', 'birth_date', 'telegram_id', 'github_id')  # Поля для редактирования
+        fields = ('username', 'email')
 
     def __init__(self, *args, **kwargs):
+        """Инициализация формы входа: настройка полей."""
         super().__init__(*args, **kwargs)
-        # Убираем help_text для username
-        self.fields['username'].help_text = None
-        # Стилизация полей Bootstrap
-        for field in self.fields:
-            self.fields[field].widget.attrs.update({'class': 'form-control'})
+        
+        # Кастомизация поля username
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control mb-2',
+            'placeholder': 'Имя пользователя',
+        })
+        # Кастомизация поля password1
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control mb-2',
+            'placeholder': 'Придумайте пароль',
+        })
+        # Кастомизация поля password2
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Повторите пароль',
+        })
+        # Сбрасываем подсказки (help_text) для полей, чтобы не отображались
+        for field_name in ('username', 'password1', 'password2'):
+            if self.fields.get(field_name):
+                # Сбрасываем подсказки (help_text)
+                self.fields[field_name].help_text = ''
+
+
+class UserProfileUpdateForm(forms.ModelForm):
+    """Форма для обновления профиля пользователя."""
+    # Метаданные формы
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'avatar', 'birth_date', 'telegram_id', 'github_id']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'birth_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'telegram_id': forms.TextInput(attrs={'class': 'form-control'}),
+            'github_id': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        """Инициализация формы обновления профиля."""
+        super().__init__(*args, **kwargs)
+        # Примечание: при необходимости можно ограничить редактирование полей
+
+class UserPasswordChangeForm(PasswordChangeForm):
+    """Форма для смены пароля пользователя."""
+    def __init__(self, *args, **kwargs):
+        """Инициализация формы смены пароля: настройка полей и сброс подсказок."""
+        super().__init__(*args, **kwargs)
+        # Кастомизация поля старого пароля
+        self.fields['old_password'].widget.attrs.update({
+            'class': 'form-control mb-2',
+            'placeholder': 'Старый пароль'
+        })
+        # Кастомизация поля нового пароля
+        self.fields['new_password1'].widget.attrs.update({
+            'class': 'form-control mb-2',
+            'placeholder': 'Новый пароль'
+        })
+        # Кастомизация поля подтверждения пароля
+        self.fields['new_password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Подтвердите новый пароль'
+        })
+        # Сброс help_text для полей пароля
+        for field_name in ('old_password', 'new_password1', 'new_password2'):
+            if self.fields.get(field_name):
+                # Сбрасываем подсказки (help_text)
+                self.fields[field_name].help_text = ''
+
+class CustomPasswordResetForm(PasswordResetForm):
+    """Кастомная форма для сброса пароля."""
+    def __init__(self, *args, **kwargs):
+        """Инициализация формы сброса пароля: настройка полей."""
+        super().__init__(*args, **kwargs)
+        # Кастомизация поля email
+        self.fields['email'].widget.attrs.update({
+            'class': 'form-control mb-2',
+            'placeholder': 'Email'
+        })
