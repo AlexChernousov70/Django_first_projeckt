@@ -140,7 +140,7 @@ def clean_password1(self):
 class UserProfileUpdateForm(UserChangeForm):
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name')  # Поля для редактирования
+        fields = ('username', 'email', 'avatar', 'birth_date', 'telegram_id', 'github_id')  # Поля для редактирования
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

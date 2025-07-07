@@ -158,7 +158,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд на случай чего
 ]
 
-# AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = 'users.User'  # Указываем Django использовать нашу кастомную модель
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # эта настройка указывает Django, куда отправлять письма. В данном случае — выводить их в консоль (терминал), а не отправлять реально. EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # альтернативная отправка 
 EMAIL_HOST = 'smtp.mail.ru' # Указывает адрес SMTP-сервера для отправки писем (например, smtp.gmail.com для Gmail или smtp.mail.ru для Mail.ru) Без этого Django не знает, куда подключаться для отправки почты.
@@ -172,4 +172,4 @@ DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_LOGIN') # Указывает email-а
 SERVER_EMAIL = os.getenv('EMAIL_HOST_LOGIN')
 EMAIL_ADMIN = os.getenv('EMAIL_HOST_LOGIN')
 
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage' # необходим для работы сообщений
